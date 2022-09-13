@@ -49,8 +49,8 @@
     [Parameter]
     public Action<TweetModel> Callback { get; set; }
 
-    public async void ItemClickCallback(TweetModel drone)
+    public async void ItemClickCallback(TweetModel tweet)
     {
-        Callback?.Invoke(drone);
+        Callback?.Invoke(tweet);
     }
 }

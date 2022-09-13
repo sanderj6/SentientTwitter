@@ -122,7 +122,7 @@ export function DisposeCharts() {
             delete window.charts["chartjs-battery"];
         }
         catch (error) {
-            console.info("Failed to dispose of drone chart");
+            console.info("Failed to dispose of tweet chart");
         }
     }
     if (window.charts["chartjs-pie"] != undefined) {
@@ -131,7 +131,7 @@ export function DisposeCharts() {
             delete window.charts["charpie-pie"];
         }
         catch (error) {
-            console.info("Failed to dispose of drone chart");
+            console.info("Failed to dispose of tweet chart");
         }
     }
 }

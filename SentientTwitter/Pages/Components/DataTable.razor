@@ -207,9 +207,9 @@
         PageItems = FilteredItems.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
     }
 
-    public async void ItemClickCallback(FlightRecord drone)
+    public async void ItemClickCallback(FlightRecord tweet)
     {
-        Callback?.Invoke(drone);
+        Callback?.Invoke(tweet);
     }
 
     public class PagingLink
