@@ -1,0 +1,56 @@
+﻿@using SentientTwitter.Data
+
+<div class="row" id="@(Status.ToString())">
+    <div class="col-10 offset-1">
+        <div class="card-styles">
+
+            <div class="block-header block-header-default">
+                <h3 class="block-title">@Status.ToString()</h3>
+            </div>
+
+            @if (!Items.Any())
+            {
+                <div class="row textClass">
+                    <div class="col-12 empty-section-spacing text-center">
+                        <p class="fw-semibold text-muted mb-0"><i class="fa-solid fa-thumbs-up thumbs-up text-success"></i></p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                foreach (var item in Items)
+                {
+                    <div class="row textClass" @onclick="(() => {ItemClickCallback(item);})">
+                        <div class="col-3"><img src="../css/images/aeroicon.svg" height="40" width="50" /><span class=itemNameFont>@item.Name</span></div>
+                        <div class="col-4 text-center">@item.Id</div>
+                        <div class="col-1 text-center"><img src="../css/images/@(Status == HealthStatus.Healthy ? "healthy": "unhealthy").png" height="25" width="25" /></div>
+                        <div class="col-2">
+                            <div class="progress mb-1" style="height: 5px;">
+                                <span class="" style="width: @(item.Battery.Charge)%;" aria-valuenow="@(item.Battery.Charge)%" aria-valuemin="0" aria-valuemax="100"><span class="progress-bar bg-success"></span></span>
+                            </div>
+                            <p class="fs-xs fw-semibold mb-0">@(item.Battery.Charge)%</p>
+                        </div>
+                        <div class="col-2 text-center text-muted text-end">@item.InServiceDate</div>
+                    </div>
+                }
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<TweetModel> Items { get; set; }
+
+    [Parameter]
+    public HealthStatus Status { get; set; }
+
+    [Parameter]
+    public Action<TweetModel> Callback { get; set; }
+
+    public async void ItemClickCallback(TweetModel drone)
+    {
+        Callback?.Invoke(drone);
+    }
+}

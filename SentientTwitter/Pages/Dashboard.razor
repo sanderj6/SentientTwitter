@@ -1,0 +1,179 @@
+﻿@page "/"
+@using SentientTwitter.Pages.Components;
+@using SentientTwitter.Data;
+@inject NavigationManager _navigationManager
+
+@if (IsItemDetails)
+{
+    <ItemDetails Model="Model" Callback="SetPageStatus" />
+}
+else
+{
+    @*HEADER*@
+    <div class="offset-1 col-10 section-spacing d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
+        <div class="flex-grow-1 mb-1 mb-md-0">
+            <h1>
+                Tweet Fleet Management
+            </h1>
+            <h2 class="h6 fw-medium text-muted mb-0">
+                Overview of Verge drone configurations and their current status
+            </h2>
+        </div>
+    </div>
+
+    @*KPIs*@
+    <div class="offset-1 col-10 section-spacing d-flex flex-row justify-content-between">
+        <div class="block block-rounded d-flex flex-column h-100 mb-0">
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                <dl class="mb-0">
+                    <dt class="fs-3 fw-bold header-color">@HealthyItems.Count()</dt>
+                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Healthy Tweets</dd>
+                </dl>
+                <div class="item item-rounded-lg bg-body-light">
+                    <i class="fa-solid fa-heart-circle-check fs-3 text-success"></i>
+                </div>
+            </div>
+            <div class="bg-body-light rounded-bottom">
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Healthy').scrollIntoView({ behavior: 'smooth'})">
+                    <span role="button">View Healthy</span>
+                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                </a>
+            </div>
+        </div>
+        <div class="block block-rounded d-flex flex-column h-100 mb-0">
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                <dl class="mb-0">
+                    <dt class="fs-3 fw-bold header-color">@UnhealthyItems.Count()</dt>
+                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Unhealthy Tweets</dd>
+                </dl>
+                <div class="item item-rounded-lg bg-body-light">
+                    <i class="fa-solid fa-heart-circle-exclamation fs-3 text-danger"></i>
+                </div>
+            </div>
+            <div class="bg-body-light rounded-bottom">
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Unhealthy').scrollIntoView({ behavior: 'smooth'})">
+                    <span role="button">View Unhealthy</span>
+                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                </a>
+            </div>
+        </div>
+        <div class="block block-rounded d-flex flex-column h-100 mb-0">
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                <dl class="mb-0">
+                    <dt class="fs-3 fw-bold header-color">@DegradedItems.Count()</dt>
+                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Degraded Tweets</dd>
+                </dl>
+                <div class="item item-rounded-lg bg-body-light">
+                    <i class="fa-solid fa-heart-circle-minus fs-3 text-warning"></i>
+                </div>
+            </div>
+            <div class="bg-body-light rounded-bottom">
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
+                    <span role="button">View Degraded</span>
+                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                </a>
+            </div>
+        </div>
+        <div class="block block-rounded d-flex flex-column h-100 mb-0">
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                <dl class="mb-0">
+                    <dt class="fs-3 fw-bold header-color">@FailedItems.Count()</dt>
+                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Failed Tweets</dd>
+                </dl>
+                <div class="item item-rounded-lg bg-body-light">
+                    <i class="fa-solid fa-heart-circle-xmark fs-3"></i>
+                </div>
+            </div>
+            <div class="bg-body-light rounded-bottom">
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Failed').scrollIntoView({ behavior: 'smooth'})">
+                    <span role="button">View Failed</span>
+                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <ItemGrouping Items="HealthyItems" Status="HealthStatus.Healthy" Callback="NavigateToDetails" />
+    <ItemGrouping Items="UnhealthyItems" Status="HealthStatus.Unhealthy" Callback="NavigateToDetails" />
+    <ItemGrouping Items="DegradedItems" Status="HealthStatus.Degraded" Callback="NavigateToDetails" />
+    <ItemGrouping Items="FailedItems" Status="HealthStatus.Failed" Callback="NavigateToDetails" />
+}
+
+
+@code {
+    public List<TweetModel> AllItems { get; set; } = new();
+
+    public List<TweetModel> HealthyItems { get; set; } = new();
+    public List<TweetModel> UnhealthyItems { get; set; } = new();
+    public List<TweetModel> DegradedItems { get; set; } = new();
+    public List<TweetModel> FailedItems { get; set; } = new();
+
+    public bool IsItemDetails;
+
+    public TweetModel Model { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        // Dummy Values
+        for (int i = 0; i < 50; i++)
+        {
+            // Random Names, Charges, etc
+            Random nameRnd = new Random();
+            int num = nameRnd.Next();
+
+            Random chargeRnd = new Random();
+            int chargeNum = chargeRnd.Next(100);
+            int cycleNum = chargeRnd.Next(1000);
+
+            Array values = Enum.GetValues(typeof(HealthStatus));
+            Random statusRnd = new Random();
+            HealthStatus randomStatus = (HealthStatus)values.GetValue(statusRnd.Next(values.Length));
+
+
+            Random gen = new Random();
+            DateTime start = new DateTime(2016, 1, 1);
+            int range = (DateTime.Today - start).Days;
+            var rndDate = start.AddDays(gen.Next(range));
+
+            AllItems.Add(new TweetModel()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = $"Tweet-{num}",
+                    Status = randomStatus,
+                    Model = "aero2A7B",
+                    InServiceDate = rndDate,
+                    Battery = new BatteryModel()
+                    {
+                        Id = Guid.NewGuid(),
+                        Capacity = 3300,
+                        Charge = chargeNum,
+                        Cycles = cycleNum,
+                        OwnerId = Guid.NewGuid(),
+                        Status = randomStatus
+                    }
+                });
+
+            HealthyItems = AllItems.Where(x => x.Status == HealthStatus.Healthy).ToList();
+            UnhealthyItems = AllItems.Where(x => x.Status == HealthStatus.Unhealthy).ToList();
+            DegradedItems = AllItems.Where(x => x.Status == HealthStatus.Mismatched).ToList();
+            FailedItems = AllItems.Where(x => x.Status == HealthStatus.Failed).ToList();
+        }
+    }
+
+    public void NavigateToDetails(TweetModel drone)
+    {
+        Model = drone;
+        IsItemDetails = true;
+        StateHasChanged();
+
+        //_navigationManager.NavigateTo($"itemdetails/{id}");
+    }
+
+    public void SetPageStatus(bool isDetails)
+    {
+        IsItemDetails = isDetails;
+        StateHasChanged();
+    }
+}
