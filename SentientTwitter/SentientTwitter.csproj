@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <None Include="Pages\Error.cshtml" />
-    <None Include="Pages\FetchData.razor" />
     <None Include="Pages\_Host.cshtml" />
     <None Include="Pages\_Layout.cshtml" />
     <None Include="Shared\MainLayout.razor" />
@@ -23,6 +22,13 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.AI.TextAnalytics" Version="5.2.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="6.0.9" />
   </ItemGroup>
 
 </Project>

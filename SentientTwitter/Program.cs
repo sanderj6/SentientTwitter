@@ -1,7 +1,10 @@
 using SentientTwitter.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using SentientTwitter.CosmosDB;
 using SentientTwitter.Data;
+using SentientTwitter.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ModalService>();
+builder.Services.AddSingleton<TextAnalyzerService>();
+
+// Cosmos
+builder.Services
+    .AddDbContextFactory<SentimentRecordDbContext>(options =>
+    options.UseCosmos("AccountEndpoint=https://mood-users.documents.azure.com:443/;AccountKey=MXEkdkP6kvzk3FM1CNjLwHHWLQc5Fk06w0g2WkEtaWVRcIgP2PwXkSr4wZEgCvBmkYNXsG3Zh3iq9iMiiOLG0A==;", "mood-user-db")
+    );
 
 var app = builder.Build();
 
