@@ -9,8 +9,8 @@
 
 @if (IsItemDetails)
 {
-    @*    <ItemDetails Model="Model" Callback="SetPageStatus" />
-*@}
+    <ItemDetails Model="Model" Callback="SetPageStatus" />
+}
 else
 {
     @*HEADER*@
@@ -23,10 +23,74 @@ else
                 Real-time Twitter stream with Tweet Sentiment
             </h2>
         </div>
+
+        <div class="float-end">
+            <label class="switch">
+                <input type="checkbox" @bind="IsStreamOpen">
+                <span class="slider round"></span>
+            </label>
+        </div>
     </div>
 
     @*KPIs*@
-    <div class="offset-1 col-10 section-spacing d-flex flex-row justify-content-between">
+    <div class="offset-1 col-10 section-spacing d-flex flex-row justify-content-between" style="min-height:25rem;">
+        <div class="block block-rounded d-flex flex-column h-100 mb-0">
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                <ul>
+                    <Virtualize Items="TopHashtags" Context="hashtag">
+                        <li class="row textClass" @onclick="(async() => {await SetFilters(hashtag);})">
+                            @hashtag
+                        </li>
+                    </Virtualize>
+                </ul>
+            </div>
+            <div class="bg-body-light rounded-bottom">
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
+                    <span role="button">View Top Hashtags</span>
+                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                </a>
+            </div>
+        </div>
+        <div class="block block-rounded d-flex flex-column h-100 mb-0">
+
+            <div>
+                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                    <dl class="mb-0">
+                        <dt class="fs-3 fw-bold header-color">@TrendingTopic</dt>
+                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Topic</dd>
+                    </dl>
+                    <div class="item item-rounded-lg bg-body-light">
+                        <i class="fa-solid fa-heart-circle-exclamation fs-3 text-danger"></i>
+                    </div>
+                </div>
+                <div class="bg-body-light rounded-bottom">
+                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Unhealthy').scrollIntoView({ behavior: 'smooth'})">
+                        <span role="button">Filter on Topic</span>
+                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                    <dl class="mb-0">
+                        <dt class="fs-3 fw-bold header-color">@TrendingSubject</dt>
+                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
+                    </dl>
+                    <div class="item item-rounded-lg bg-body-light">
+                        <i class="fa-solid fa-heart-circle-minus fs-3 text-warning"></i>
+                    </div>
+                </div>
+                <div class="bg-body-light rounded-bottom">
+                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
+                        <span role="button">Filter on Subject</span>
+                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
         <div class="block block-rounded d-flex flex-column h-100 mb-0">
             <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                 <dl class="mb-0">
@@ -39,103 +103,68 @@ else
             </div>
             <div class="bg-body-light rounded-bottom">
                 <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Healthy').scrollIntoView({ behavior: 'smooth'})">
-                    <span role="button">View Healthy</span>
+                    <span role="button">View All</span>
                     <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                 </a>
-            </div>
-        </div>
-        <div class="block block-rounded d-flex flex-column h-100 mb-0" style="height:20rem;">
-            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                <dl class="mb-0">
-                    <dt class="fs-3 fw-bold header-color">bac</dt>
-                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Topic</dd>
-                </dl>
-                <div class="item item-rounded-lg bg-body-light">
-                    <i class="fa-solid fa-heart-circle-exclamation fs-3 text-danger"></i>
-                </div>
-            </div>
-            <div class="bg-body-light rounded-bottom">
-                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Unhealthy').scrollIntoView({ behavior: 'smooth'})">
-                    <span role="button">View Unhealthy</span>
-                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                </a>
-            </div>
-        </div>
-        <div class="block block-rounded d-flex flex-column h-100 mb-0">
-            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                <dl class="mb-0">
-                    <dt class="fs-3 fw-bold header-color">abc</dt>
-                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
-                </dl>
-                <div class="item item-rounded-lg bg-body-light">
-                    <i class="fa-solid fa-heart-circle-minus fs-3 text-warning"></i>
-                </div>
-            </div>
-            <div class="bg-body-light rounded-bottom">
-                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
-                    <span role="button">View Degraded</span>
-                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                </a>
-            </div>
-        </div>
-        <div class="block block-rounded d-flex flex-column h-100 mb-0">
-            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                <ul>
-                    @* @foreach (var tag in TopHashtags)
-                {
-                <li>
-                @tag.Key.tag
-                </li>
-                }*@
-                </ul>
             </div>
         </div>
     </div>
 
-    @*    <div class="offset-1 col-10 section-spacing d-flex flex-row justify-content-between">
-        <label class="switch">
-            <input type="checkbox" @bind="IsStreamOpen">
-            <span class="slider round"></span>
-        </label>
-    </div>*@
+    @*Filtered Stream*@
+    @if (IsFilterEnabled)
+    {
+        <ItemGrouping Items="FilteredItems" IsFilteringEnabled="IsFilterEnabled" Filter="Filter" Callback="NavigateToDetails" />
+    }
 
-    <div>
-        <button class="btn btn-primary btn-block" @onclick="ToggleStream">Stream ON</button>
-    </div>
-
-    <ItemGrouping Items="FilteredItems" />
-    <ItemGrouping Items="AllItems" />
+    @*Live Stream*@
+    <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" />
 }
 
-
+<style>
+    ul.no-bullets {
+        list-style-type: none; /* Remove bullets */
+        padding: 0; /* Remove padding */
+        margin: 0; /* Remove margins */
+    }
+</style>
 @code {
     public List<TweetModel> AllItems { get; set; } = new();
     public List<TweetModel> FilteredLive { get; set; } = new();
     public List<TweetModel> FilteredItems { get; set; } = new();
 
     public bool IsItemDetails;
-    public bool IsStreamOpen;
+    public bool IsFilterEnabled;
+    public bool IsStreamOpen
+    {
+        get
+        {
+            return _isStreamOpen;
+        }
+        set
+        {
+            _isStreamOpen = value;
+            ToggleStream(value);
+        }
+    }
+    private bool _isStreamOpen;
 
     public List<string> AllTweets { get; set; } = new();
     public TweetModel Model { get; set; }
 
     // Popular Topic
-    //public Dictionary<Hashtag, int> Hash
-    // Popular Topic
     public Dictionary<Hashtag, int> HashTags { get; set; } = new();
     public Dictionary<Domain, int> Topics { get; set; } = new();
     public Dictionary<Entity, int> Subjects { get; set; } = new();
 
-    public List<KeyValuePair<Hashtag, int>> TopHashtags => HashTags.Count() == 0 ? new() : HashTags.OrderByDescending(x => x.Value).Take(10).ToList();
-    //public string TrendingTopic => Topics.Count() == 0 ? string.Empty : Topics.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
-    public string TrendingTopic => string.Empty;
-    //public string TrendingSubject => Subjects.Count() == 0 ? string.Empty : Subjects.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
-    public string TrendingSubject => string.Empty;
+    public List<string> TopHashtags { get; set; } = new();
+    public string TrendingTopic { get; set; } = string.Empty;
+    public string TrendingSubject { get; set; } = string.Empty;
+
+    public string Filter { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         _twitterService.TweetReceived += ShowTweet;
-        //var test = await _twitterService.GetTweets();
     }
 
     public async void ShowTweet(object sender, TweetEventReceived eventArgs)
@@ -203,7 +232,7 @@ else
             {
                 foreach (var tag in hashtags)
                 {
-                    var matchTag = HashTags.Where(x => x.Key.tag == tag?.tag).FirstOrDefault();
+                    var matchTag = HashTags.Where(x => x.Key.tag.ToUpper().Trim() == tag?.tag.ToUpper().Trim()).FirstOrDefault();
                     if (matchTag.Key is null)
                     {
                         HashTags.Add(tag, 1);
@@ -214,16 +243,17 @@ else
                     }
                 }
             }
+
+            TopHashtags = HashTags.OrderByDescending(x => x.Value).Select(y => y.Key.tag).Take(10).ToList();
         }
 
         foreach (var context in tweetStream.data.context_annotations)
         {
-
             // TOPIC
             var topic = context.domain;
             if (topic is not null)
             {
-                var match = Topics.Where(x => x.Key.name == topic?.name).FirstOrDefault();
+                var match = Topics.Where(x => x.Key.name.ToUpper().Trim() == topic?.name.ToUpper().Trim()).FirstOrDefault();
                 if (match.Key is null)
                 {
                     Topics.Add(topic, 1);
@@ -232,13 +262,15 @@ else
                 {
                     Topics[match.Key] = match.Value + 1;
                 }
+
+                TrendingTopic = Topics.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
             }
 
             // SUBJECT
             var subject = context.entity;
             if (subject is not null)
             {
-                var match = Subjects.Where(x => x.Key.name == subject?.name).FirstOrDefault();
+                var match = Subjects.Where(x => x.Key.name.ToUpper().Trim() == subject?.name.ToUpper().Trim()).FirstOrDefault();
                 if (match.Key is null)
                 {
                     Subjects.Add(subject, 1);
@@ -247,12 +279,17 @@ else
                 {
                     Subjects[match.Key] = match.Value + 1;
                 }
+
+                TrendingSubject = Subjects.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
             }
         }
+    }
 
-        //Model = tweet;
-        //IsItemDetails = true;
-        //StateHasChanged();
+    public void NavigateToDetails(TweetModel tweet)
+    {
+        Model = tweet;
+        IsItemDetails = true;
+        StateHasChanged();
     }
 
     public void SetPageStatus(bool isDetails)
@@ -261,17 +298,22 @@ else
         StateHasChanged();
     }
 
-    public async Task ToggleStream()
+    public async Task SetFilters(string filter)
     {
-        IsStreamOpen = !IsStreamOpen;
+        IsFilterEnabled = true;
+        Filter = filter;
+        await InvokeAsync(StateHasChanged);
+    }
 
-        if (IsStreamOpen)
+    public async Task ToggleStream(bool isOpen)
+    {
+        if (isOpen)
         {
-            await _twitterService.GetTweets();
+            await _twitterService.StartStream();
         }
         else
         {
-            //await _twitterService.StopStream();
+            await _twitterService.StopStream();
         }
     }
 }

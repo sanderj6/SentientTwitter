@@ -23,6 +23,8 @@ public class TwitterService
     private TextAnalyzerService TextAnalyzerService { get; set; }
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
+    public bool IsStreamOpen { get; set; } = true;
+
     public TwitterService()
     {
         var endpoint = "https://api.twitter.com/2/tweets/search/recent?query=from:twitterdev";
@@ -30,17 +32,6 @@ public class TwitterService
         var apiSecret = "wRk2DaTYYDHpnhRL5lYJLuSD8XYxaWi47shcD4sX1RcCa6vHRW";
         var bearerToken = "AAAAAAAAAAAAAAAAAAAAACMyhAEAAAAAhxbfVkBArjpCnXzMXi%2FuxLuRKK4%3D7VCzjnLTYndhWvUzVW3Azl8VxyB1dpl3WXHACsNjnM2bwKbzi4";
 
-        // Sentiment
-        var sentimentEndpoint = "https://moodanalyzer.cognitiveservices.azure.com/";
-        var sentimentApiKey = "e26a9d4c01a64468bf1600f5cb104a12";
-
-        //AnalyzeSentimentOptions options = new AnalyzeSentimentOptions()
-        //{
-        //    IncludeStatistics = true,
-        //    IncludeOpinionMining = true
-        //};
-
-        TextAnalyzerService = new TextAnalyzerService();
         _backgroundTaskQueue = new BackgroundTaskQueue(null, 1);
     }
 
@@ -55,10 +46,8 @@ public class TwitterService
         public string EventName { get; set; }
     }
 
-    public async Task<TweetStreamData> GetTweets()
+    public async Task StartStream()
     {
-        TweetStreamData tweet = new();
-
         try
         {
             // Http Client Instantiation
@@ -69,10 +58,7 @@ public class TwitterService
             httpClient.Timeout = new TimeSpan(0, 0, 30);
             var _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-            // Serialize Data
-            //var myContent = JsonConvert.SerializeObject(stream);
-            //StringContent data = new StringContent(myContent, Encoding.UTF8, "application/json");
-
+            // Stream
             using (httpClient)
             {
                 var response = await httpClient.GetAsync("https://api.twitter.com/2/tweets/sample/stream?tweet.fields=context_annotations,lang,entities", HttpCompletionOption.ResponseHeadersRead);
@@ -81,16 +67,15 @@ public class TwitterService
 
                 using (var stream = await response.Content.ReadAsStreamAsync())
                 using (var streamReader = new StreamReader(stream))
-                using (var jsonReader = new JsonTextReader(streamReader))
                 {
                     var serializer = new JsonSerializer();
 
                     // Process the response.
-                    while (!streamReader.EndOfStream)
+                    while (!streamReader.EndOfStream && IsStreamOpen)
                     {
                         try
                         {
-                            tweet = JsonConvert.DeserializeObject<TweetStreamData>(streamReader.ReadLine());
+                            var tweet = JsonConvert.DeserializeObject<TweetStreamData>(streamReader.ReadLine());
                             if (tweet is null || tweet.data is null) continue;
 
                             TweetReceived?.Invoke(this, new TweetEventReceived(tweet, "received"));
@@ -99,29 +84,29 @@ public class TwitterService
                         }
                         catch (Exception ex)
                         {
-                            // TODO: if disconnected, attempt reconnect
-                            System.Diagnostics.Debug.WriteLine($"Could not send HTTP request: {ex}");
+                            // If disconnected, attempt reconnect
+                            Debug.WriteLine($"Could not send HTTP request: {ex}");
+                            continue;
                         }
                     }
-                }
-            }
 
-            return tweet;
+                    stream.Close();
+                    streamReader.Close();
+                }
+
+                httpClient.Dispose();
+            }
         }
         catch (Exception ex)
         {
             // TODO: if disconnected, attempt reconnect
-            System.Diagnostics.Debug.WriteLine($"Could not send HTTP request: {ex}");
-
-            return tweet;
+            Debug.WriteLine($"Could not send HTTP request: {ex}");
         }
     }
 
-    public async ValueTask ProcessTwitterSentiment(TweetStreamData tweetStream, CancellationToken cancellationToken)
+    public async Task StopStream()
     {
-        //await Task.Delay(1000);
-        var sentiment = await TextAnalyzerService.AnalyzeText(tweetStream.data.text);
-        tweetStream.sentiment = sentiment;
-        //TweetReceived?.Invoke(this, new TweetEventReceived(tweetStream.data.text, "processed"));
+        IsStreamOpen = false;
+        await this.StartStream();
     }
 }

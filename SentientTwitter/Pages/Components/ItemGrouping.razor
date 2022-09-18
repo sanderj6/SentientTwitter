@@ -19,7 +19,7 @@
             }
             else
             {
-                <div class="h-50">
+                <div style="max-height:@FilteredCSS; overflow-y:scroll;">
                     @if (Items.Count() > 0)
                     {
                         <Virtualize Items="Items" Context="item">
@@ -51,27 +51,35 @@
     [Parameter]
     public Action<TweetModel> Callback { get; set; }
 
+    [Parameter]
+    public bool IsFilteringEnabled { get; set; }
+
+    [Parameter]
+    public string Filter
+    {
+        get { return _filter; }
+        set
+        {
+            _filter = value;
+            FilterTweets(_filter);
+        }
+    }
+    private string _filter;
+
+    public string FilteredCSS => IsFilteringEnabled ? "20rem" : "40rem";
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        FilterItems = Items;
-        //var test = await _twitterService.GetTweets();
+        FilterItems = Items.Where(x => x.Text.ToUpper().Contains(Filter)).ToList();
+        //var test = await _twitterService.StartStream();
     }
 
-    //[Parameter]
-    //public string Filter {
-    //    get { return _filter; }
-    //    set { _filter = value;
-    //        FilterTweets(_filter);
-    //    }
-    //}
 
-    //private string _filter;
-
-    //public async Task FilterTweets(string filter){
-    //    //Items = Items.Where(x => x.Text.ToUpper().Contains(filter)).ToList();
-    //    //await InvokeAsync(StateHasChanged);
-    //}
+    public async Task FilterTweets(string filter){
+        //Items = Items.Where(x => x.Text.ToUpper().Contains(filter)).ToList();
+        //await InvokeAsync(StateHasChanged);
+    }
 
     public async void ItemClickCallback(TweetModel tweet)
     {
