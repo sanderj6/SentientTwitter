@@ -13,6 +13,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ModalService>();
 builder.Services.AddSingleton<TextAnalyzerService>();
+builder.Services.AddSingleton<TwitterService>();
 
 // Cosmos
 builder.Services

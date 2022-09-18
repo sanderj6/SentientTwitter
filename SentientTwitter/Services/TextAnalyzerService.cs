@@ -25,7 +25,7 @@ public class TextAnalyzerService
         //    IncludeOpinionMining = true
         //};
 
-        //SentimentClient = new TextAnalyticsClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+        SentimentClient = new TextAnalyticsClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
     }
 
     public async Task<Azure.AI.TextAnalytics.DocumentSentiment> AnalyzeText(string text)

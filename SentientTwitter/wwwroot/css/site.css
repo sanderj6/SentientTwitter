@@ -198,7 +198,6 @@ body[data-dark='true'] .app-modal {
     width: 30%;
 }
 
-
 /*Large*/
 @media screen and (max-width: 1024px) {
     .modal-tiny, .modal-xs, .modal-sm {
