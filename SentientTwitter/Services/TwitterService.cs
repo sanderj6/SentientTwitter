@@ -12,27 +12,33 @@ using Microsoft.Azure.Cosmos;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using Microsoft.AspNetCore.Identity;
 using System.Threading;
+using System.Configuration;
 
 namespace SentientTwitter.Services;
+
+public interface ITwitterService
+{
+    Task StartStream();
+    Task StopStream();
+}
 
 public class TwitterService
 {
     public delegate void OnTweetReceived(object sender, TweetEventReceived e);
-    public event OnTweetReceived TweetReceived;
+    public event OnTweetReceived? TweetReceived;
 
-    private TextAnalyzerService TextAnalyzerService { get; set; }
-    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private IConfiguration _configuration;
+
+    private HttpClient? httpClient;
+    private string bearerToken;
 
     public bool IsStreamOpen { get; set; } = true;
 
-    public TwitterService()
+    public TwitterService(IConfiguration configuration)
     {
-        var endpoint = "https://api.twitter.com/2/tweets/search/recent?query=from:twitterdev";
-        var apiKey = "sz6YBuiFzkMHJRW15S9nVQKqv";
-        var apiSecret = "wRk2DaTYYDHpnhRL5lYJLuSD8XYxaWi47shcD4sX1RcCa6vHRW";
-        var bearerToken = "AAAAAAAAAAAAAAAAAAAAACMyhAEAAAAAhxbfVkBArjpCnXzMXi%2FuxLuRKK4%3D7VCzjnLTYndhWvUzVW3Azl8VxyB1dpl3WXHACsNjnM2bwKbzi4";
+        _configuration = configuration;
 
-        _backgroundTaskQueue = new BackgroundTaskQueue(null, 1);
+        bearerToken = _configuration.GetSection("Twitter").GetSection("bearerToken").Value;
     }
 
     public class TweetEventReceived : EventArgs
@@ -51,18 +57,16 @@ public class TwitterService
         try
         {
             // Http Client Instantiation
-            var httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri("https://api.twitter.com/2/tweets/sample/stream");
+            httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri("https://api.twitter.com/2/tweets/sample/stream?tweet.fields=context_annotations,lang,entities");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "AAAAAAAAAAAAAAAAAAAAACMyhAEAAAAAhxbfVkBArjpCnXzMXi%2FuxLuRKK4%3D7VCzjnLTYndhWvUzVW3Azl8VxyB1dpl3WXHACsNjnM2bwKbzi4");
-            httpClient.Timeout = new TimeSpan(0, 0, 30);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
             var _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
             // Stream
             using (httpClient)
             {
                 var response = await httpClient.GetAsync("https://api.twitter.com/2/tweets/sample/stream?tweet.fields=context_annotations,lang,entities", HttpCompletionOption.ResponseHeadersRead);
-
                 response.EnsureSuccessStatusCode();
 
                 using (var stream = await response.Content.ReadAsStreamAsync())
@@ -90,6 +94,7 @@ public class TwitterService
                         }
                     }
 
+                    // Redundant
                     stream.Close();
                     streamReader.Close();
                 }
@@ -99,7 +104,6 @@ public class TwitterService
         }
         catch (Exception ex)
         {
-            // TODO: if disconnected, attempt reconnect
             Debug.WriteLine($"Could not send HTTP request: {ex}");
         }
     }

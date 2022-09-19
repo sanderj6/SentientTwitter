@@ -3,10 +3,12 @@
 @using SentientTwitter.Pages.Components;
 @using SentientTwitter.Data;
 @using SentientTwitter.Services;
+@using System.Diagnostics;
 @using static SentientTwitter.Services.TwitterService
-@inject NavigationManager _navigationManager
+
 @inject TwitterService _twitterService
 @inject TextAnalyzerService _textAnalyzerService
+@inject IJSRuntime JsRuntime
 
 @*HEADER*@
 <div class="offset-1 col-10 section-spacing d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
@@ -15,13 +17,13 @@
             Tweet Fleet
         </h1>
         <h2 class="h6 fw-medium text-muted mb-0">
-            Real-time Twitter stream with Tweet Sentiment
+            Real-time Twitter Stream with Tweet Sentiment
         </h2>
     </div>
 
     <div class="float-end">
         <label class="switch">
-            <input type="checkbox" @bind="IsStreamOpen">
+            <input type="checkbox" @bind="IsStreamOpen" disabled>
             <span class="slider round"></span>
         </label>
     </div>
@@ -38,12 +40,12 @@
                     <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Total Tweets</dd>
                 </dl>
                 <div class="item item-rounded-lg bg-body-light">
-                    <i class="fa-solid fa-heart-circle-check fs-3 text-success"></i>
+                    <i class="fa-brands fa-twitter fs-3 text-info"></i>
                 </div>
             </div>
             <div class="bg-body-light rounded-bottom">
-                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Healthy').scrollIntoView({ behavior: 'smooth'})">
-                    <span role="button">View All</span>
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
+                    <span role="button">View History</span>
                     <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                 </a>
             </div>
@@ -56,12 +58,9 @@
                     <dt class="fs-3 fw-bold header-color">@TrendingSubject</dt>
                     <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
                 </dl>
-                <div class="item item-rounded-lg bg-body-light">
-                    <i class="fa-solid fa-heart-circle-minus fs-3 text-warning"></i>
-                </div>
             </div>
             <div class="bg-body-light rounded-bottom">
-                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
                     <span role="button">Filter on Subject</span>
                     <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                 </a>
@@ -69,13 +68,13 @@
         </div>
     </div>
 
-    <div class="block block-rounded d-flex flex-column h-100 mb-4">
+    <div class="block block-rounded d-flex flex-column h-100 mb-4 align-self-center">
         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
             <ul>
                 <Virtualize Items="TopHashtags" Context="hashtag">
                     <ItemContent>
                         <li class="row textClass" @onclick="(async() => {await SetFilters(hashtag);})">
-                            @hashtag
+                            #@hashtag
                         </li>
                     </ItemContent>
                     <Placeholder>
@@ -85,7 +84,7 @@
             </ul>
         </div>
         <div class="bg-body-light rounded-bottom">
-            <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
+            <a @onclick="(async() => {await SetFilters(string.Empty, true);})" class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
                 <span role="button">View Top Hashtags</span>
                 <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
             </a>
@@ -100,7 +99,9 @@
             </div>
             @if (Model is null)
             {
-                <p class="text-center fw-bold mt-4">Please select a tweet to analyze!</p>
+                <div class="flex-grow-1 d-flex align-items-center justify-content-center p-3">
+                    <p class="text-center fw-bold mt-4">Please select a tweet to analyze!</p>
+                </div>
             }
             else
             {
@@ -124,37 +125,8 @@
                                     </div>
                                 </div>
 
-                                <div class="row textClass justify-content-between">
-                                    <div class="col-4">
-                                        Positive Score
-                                    </div>
-                                    <div class="col-6 text-break">
-                                        <span class="col-6 text-break text-details text-muted">
-                                            @Model.Sentiment.ConfidenceScores.Positive
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="row textClass justify-content-between">
-                                    <div class="col-4">
-                                        Neutral Score
-                                    </div>
-                                    <div class="col-6 text-break">
-                                        <span class="col-6 text-break text-details text-muted">
-                                            @Model.Sentiment.ConfidenceScores.Neutral
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="row textClass justify-content-between">
-                                    <div class="col-4">
-                                        Negative Score
-                                    </div>
-                                    <div class="col-6 text-break">
-                                        <span class="col-6 text-break text-details text-muted">
-                                            @Model.Sentiment.ConfidenceScores.Negative
-                                        </span>
-                                    </div>
+                                <div class="">
+                                    <canvas id="chartjs-pie" style=""></canvas>
                                 </div>
                             }
                         </div>
@@ -201,7 +173,7 @@
 
 </div>
 
-@*Current Filters*@
+@*Active Filters*@
 <div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
     <div class="row justify-content-around w-100">
         @foreach (var tag in FilteredHashtags)
@@ -211,56 +183,29 @@
     </div>
 </div>
 
-@*Filtered Stream*@
-@if (IsFilterEnabled)
-{
-    <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Filters="FilteredHashtags" Callback="NavigateToDetails" />
-}
+@*Streams*@
+<div class="offset-1 col-10 section-spacing d-flex flex-row flex-row-wrap justify-content-between align-self-stretch">
 
-@*Live Stream*@
-<ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Callback="NavigateToDetails" />
+    @*Live Stream*@
+    <div style="flex: 1 1 0;">
+        <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Callback="ShowDetails" />
+    </div>
+
+    @*Filtered Stream*@
+    @if (IsFilterEnabled)
+    {
+        <div style="flex: 1 1 0;">
+            <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Filters="FilteredHashtags" Callback="ShowDetails" />
+        </div>
+    }
+
+</div>
 
 <style>
     ul.no-bullets {
         list-style-type: none; /* Remove bullets */
         padding: 0; /* Remove padding */
         margin: 0; /* Remove margins */
-    }
-
-    .form-control.form-control-date {
-        padding: 0;
-    }
-
-    .block-title {
-        flex: 1 1 auto;
-        min-height: 1.75rem;
-        margin: 0;
-        font-size: .875rem;
-        font-weight: 600;
-        line-height: 1.75rem;
-        text-transform: uppercase;
-        letter-spacing: .0625rem;
-    }
-
-    .block-content.block-content-full {
-        padding-bottom: 1.25rem;
-    }
-
-    .block-content {
-        transition: opacity .25s ease-out;
-        width: 100%;
-        margin: 0 auto;
-        padding: 1.25rem 1.25rem 1px;
-        overflow-x: visible;
-    }
-
-        .block-content.block-rounded > .block-header, .block.block-rounded > .nav-tabs {
-            border-top-left-radius: 0.25rem;
-            border-top-right-radius: 0.25rem;
-        }
-
-    .block-header-default {
-        background-color: #f6f7f9;
     }
 
     .block-title {
@@ -284,14 +229,6 @@
         transition: opacity 3s ease-out;
     }
 
-    .textClass {
-        font-family: 'Open Sans', sans-serif;
-        padding: 5px 10px 5px 10px;
-        border-radius: 0rem;
-        align-items: center;
-        margin: 0;
-    }
-
     .card-styles {
         border-radius: 0.3rem;
         background: #ffffff;
@@ -310,16 +247,6 @@
         color: #65a30d !important;
     }
 
-    .text-success {
-        --bs-text-opacity: 1;
-        color: rgba(var(--bs-success-rgb), var(--bs-text-opacity)) !important;
-    }
-
-    .text-info {
-        --bs-text-opacity: 1;
-        color: rgba(var(--bs-info-rgb), var(--bs-text-opacity)) !important;
-    }
-
     .text-info {
         color: #0891b2 !important;
     }
@@ -327,26 +254,13 @@
     .bg-info-light {
         background-color: #cee9f0 !important;
     }
-
-    .availability-spacing {
-        margin-top 30px;
-        height: 45vh;
-        display: flex;
-    }
-
-    .section-spacing {
-        margin-top: 50px;
-        margin-bottom: 50px;
-    }
 </style>
 
 @code {
     public List<TweetModel> AllItems { get; set; } = new();
-    public List<TweetModel> FilteredLive { get; set; } = new();
-    public List<TweetModel> FilteredItems { get; set; } = new();
 
-    public bool IsItemDetails;
     public bool IsFilterEnabled;
+
     public bool IsStreamOpen
     {
         get
@@ -361,7 +275,7 @@
     }
     private bool _isStreamOpen { get; set; } = true;
 
-    public TweetModel Model { get; set; }
+    public TweetModel Model { get; set; } = new();
 
     // Popular Topic
     public Dictionary<Hashtag, int> HashTags { get; set; } = new();
@@ -375,10 +289,9 @@
 
     public string Filter { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
-    {
-        _twitterService.TweetReceived += ShowTweet;
-    }
+    // Chart
+    private IJSObjectReference ChartsModule { get; set; }
+    public List<ChartData> PieChartData { get; set; } = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -388,6 +301,7 @@
         {
             try
             {
+                _twitterService.TweetReceived += ProcessTweet;
                 await _twitterService.StartStream();
             }
             catch (Exception ex)
@@ -397,21 +311,18 @@
         }
     }
 
-    public async void ShowTweet(object sender, TweetEventReceived eventArgs)
+    // Twitter Service Callback
+    public async void ProcessTweet(object sender, TweetEventReceived eventArgs)
     {
-        var newTweet = CreateTweet(eventArgs.TweetStream);
-        CalculateTrending(eventArgs.TweetStream);
+        var newTweet = CreateTweetFromStream(eventArgs.TweetStream);
         AllItems.Add(newTweet);
 
-        //FilteredLive.Clear();
-        //FilteredLive = AllItems.OrdByDescending(x => x.CreatedDate).Take(100).ToList();
-        //FilteredItems = AllItems.Where(x => x.Text.ToUpper().Contains("CUM")).OrderByDescending(x => x.CreatedDate).Take(100).ToList();
-
+        CalculateTrending(eventArgs.TweetStream).ConfigureAwait(false);
         await InvokeAsync(StateHasChanged);
-        // Determine sentiment
     }
 
-    public TweetModel CreateTweet(TweetStreamData tweet)
+    // Convert from stream to Tweet Model
+    public TweetModel CreateTweetFromStream(TweetStreamData tweet)
     {
         return new TweetModel()
             {
@@ -425,88 +336,122 @@
             };
     }
 
-    public void CalculateTrending(TweetStreamData tweetStream)
+    // Calculate Hashtags, Domains, and Subjects
+    public async Task CalculateTrending(TweetStreamData tweetStream)
     {
-        if (tweetStream.data.context_annotations is null) return;
+        // Calculate tranding via tasks to be more performant
+        var tasks = new List<Task>();
 
         // Hashtags
-        if (tweetStream.data.entities is not null)
-        {
-            var hashtags = tweetStream.data.entities.hashtags;
-            if (hashtags is not null)
-            {
-                foreach (var tag in hashtags)
-                {
-                    var matchTag = HashTags.Where(x => x.Key.tag.ToUpper().Trim() == tag?.tag.ToUpper().Trim()).FirstOrDefault();
-                    if (matchTag.Key is null)
-                    {
-                        HashTags.Add(tag, 1);
-                    }
-                    else
-                    {
-                        HashTags[matchTag.Key] = matchTag.Value + 1;
-                    }
-                }
-            }
+        tasks.Add(Task.Run(() =>
+           {
+               if (tweetStream.data.entities is not null)
+               {
+                   var hashtags = tweetStream.data.entities.hashtags;
+                   if (hashtags is not null)
+                   {
+                       foreach (var tag in hashtags)
+                       {
+                           var matchTag = HashTags.Where(x => x.Key.tag.ToUpper().Trim() == tag?.tag.ToUpper().Trim()).FirstOrDefault();
+                           if (matchTag.Key is null)
+                           {
+                               HashTags.Add(tag, 1);
+                           }
+                           else
+                           {
+                               HashTags[matchTag.Key] = matchTag.Value + 1;
+                           }
+                       }
+                   }
 
-            TopHashtags = HashTags.OrderByDescending(x => x.Value).Select(y => y.Key.tag).Take(10).ToList();
+                   TopHashtags = HashTags.OrderByDescending(x => x.Value).Select(y => y.Key.tag).Take(10).ToList();
+               }
+           }));
+
+        // DOMAIN and ENTITY
+        tasks.Add(Task.Run(() =>
+           {
+               if (tweetStream.data.context_annotations is not null)
+               {
+                   foreach (var context in tweetStream.data.context_annotations)
+                   {
+                       // TOPIC
+                       var topic = context.domain;
+                       if (topic is not null)
+                       {
+                           var match = Topics.Where(x => x.Key.name.ToUpper().Trim() == topic?.name.ToUpper().Trim()).FirstOrDefault();
+                           if (match.Key is null)
+                           {
+                               Topics.Add(topic, 1);
+                           }
+                           else
+                           {
+                               Topics[match.Key] = match.Value + 1;
+                           }
+
+                           TrendingTopic = Topics.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
+                       }
+
+                       // SUBJECT
+                       var subject = context.entity;
+                       if (subject is not null)
+                       {
+                           var match = Subjects.Where(x => x.Key.name.ToUpper().Trim() == subject?.name.ToUpper().Trim()).FirstOrDefault();
+                           if (match.Key is null)
+                           {
+                               Subjects.Add(subject, 1);
+                           }
+                           else
+                           {
+                               Subjects[match.Key] = match.Value + 1;
+                           }
+
+                           TrendingSubject = Subjects.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
+                       }
+                   }
+               }
+           }));
+
+        try
+        {
+            await Task.WhenAll(tasks.ToArray());
         }
-
-        foreach (var context in tweetStream.data.context_annotations)
+        catch (Exception ex)
         {
-            // TOPIC
-            var topic = context.domain;
-            if (topic is not null)
-            {
-                var match = Topics.Where(x => x.Key.name.ToUpper().Trim() == topic?.name.ToUpper().Trim()).FirstOrDefault();
-                if (match.Key is null)
-                {
-                    Topics.Add(topic, 1);
-                }
-                else
-                {
-                    Topics[match.Key] = match.Value + 1;
-                }
-
-                TrendingTopic = Topics.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
-            }
-
-            // SUBJECT
-            var subject = context.entity;
-            if (subject is not null)
-            {
-                var match = Subjects.Where(x => x.Key.name.ToUpper().Trim() == subject?.name.ToUpper().Trim()).FirstOrDefault();
-                if (match.Key is null)
-                {
-                    Subjects.Add(subject, 1);
-                }
-                else
-                {
-                    Subjects[match.Key] = match.Value + 1;
-                }
-
-                TrendingSubject = Subjects.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
-            }
+            Debug.WriteLine($"Could not finish trending tasks: {ex}");
         }
     }
 
-    public async void NavigateToDetails(TweetModel tweet)
+    // Analyze Sentiment and Render Chart
+    public async void ShowDetails(TweetModel tweet)
     {
         Model = tweet;
         Model.Sentiment = await _textAnalyzerService.AnalyzeText(tweet.Text);
         StateHasChanged();
+
+        ChartsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", new CancellationToken(), "./js/GeneratedJS/ItemCharts.js");
+        RenderCharts();
     }
 
-    public void SetPageStatus(bool isDetails)
-    {
-        IsItemDetails = isDetails;
-        StateHasChanged();
-    }
-
-    public async Task SetFilters(string filter)
+    public async Task SetFilters(string filter, bool isAllFilters = false)
     {
         IsFilterEnabled = true;
-        FilteredHashtags.Add(filter);
+
+        if (isAllFilters)
+        {
+            // Add all filters
+            FilteredHashtags.Clear();
+            FilteredHashtags.AddRange(TopHashtags);
+        }
+        else
+        {
+            // Add filter if it doesn't already exist
+            if (!FilteredHashtags.Contains(filter))
+            {
+                FilteredHashtags.Add(filter);
+            }
+        }
+
         await InvokeAsync(StateHasChanged);
     }
 
@@ -520,6 +465,24 @@
         }
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    public async void RenderCharts()
+    {
+        try
+        {
+            // Pie Chart Data
+            var Percentages = new decimal[] {
+                (decimal)Model.Sentiment.ConfidenceScores.Positive * 100,
+                (decimal)Model.Sentiment.ConfidenceScores.Neutral * 100,
+                (decimal)Model.Sentiment.ConfidenceScores.Negative * 100};
+
+            await ChartsModule.InvokeVoidAsync("RenderCharts", new CancellationToken(), Percentages);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Issue rendering charts: {ex}");
+        }
     }
 
     public async Task ToggleStream(bool isOpen)

@@ -25,14 +25,14 @@
                         <Virtualize Items="Items" Context="item" ItemSize="50">
                             <ItemContent>
                                 <div class="row textClass" @onclick="(() => {ItemClickCallback(item);})">
-                                    <div class="col-5 text-center">@item.Text</div>
-                                    <div class="col-1 text-center">Positive</div>
-                                    <div class="col-3">
+                                    <div class="col-6 text-center">@item.Text</div>
+                                    <div class="col-2">
                                         @item.Domain?.name
                                     </div>
-                                    <div class="col-3">
+                                    <div class="col-2">
                                         @item.Entity?.name
                                     </div>
+                                    <div class="col-2 text-center">@item.Language</div>
                                 </div>
                             </ItemContent>
                             <Placeholder>
@@ -72,7 +72,7 @@
     }
     private List<string> _filters;
 
-    public string FilteredCSS => IsFilteringEnabled ? "10rem" : "20rem";
+    public string FilteredCSS => IsFilteringEnabled ? "20rem" : "20rem";
     public string StreamName => Filters is not null ? "Filtered" : "Live";
 
     public async Task FilterTweets(List<string> _filters)

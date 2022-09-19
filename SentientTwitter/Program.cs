@@ -17,7 +17,7 @@ builder.Services.AddSingleton<TwitterService>();
 
 // Cosmos
 builder.Services
-    .AddDbContextFactory<SentimentRecordDbContext>(options =>
+    .AddDbContextFactory<TwitterRecordDbContext>(options =>
     options.UseCosmos("AccountEndpoint=https://mood-users.documents.azure.com:443/;AccountKey=MXEkdkP6kvzk3FM1CNjLwHHWLQc5Fk06w0g2WkEtaWVRcIgP2PwXkSr4wZEgCvBmkYNXsG3Zh3iq9iMiiOLG0A==;", "mood-user-db")
     );
 
@@ -27,7 +27,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

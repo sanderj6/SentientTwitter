@@ -49,7 +49,6 @@ namespace SentientTwitter.Services
             OnShow?.Invoke(title, classSize, dismissable, content);
         }
 
-
         public void Hide()
         {
             OnHide?.Invoke();
