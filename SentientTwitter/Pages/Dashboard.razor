@@ -33,7 +33,47 @@ else
     </div>
 
     @*KPIs*@
-    <div class="offset-1 col-10 section-spacing d-flex flex-row justify-content-between" style="min-height:25rem;">
+    <div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
+
+        <div class="d-flex flex-column justify-content-between">
+            <div class="block block-rounded d-flex flex-column h-100 mb-4">
+                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                    <dl class="mb-0">
+                        <dt class="fs-3 fw-bold header-color">@AllItems.Count()</dt>
+                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Total Tweets</dd>
+                    </dl>
+                    <div class="item item-rounded-lg bg-body-light">
+                        <i class="fa-solid fa-heart-circle-check fs-3 text-success"></i>
+                    </div>
+                </div>
+                <div class="bg-body-light rounded-bottom">
+                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Healthy').scrollIntoView({ behavior: 'smooth'})">
+                        <span role="button">View All</span>
+                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="block block-rounded d-flex flex-column h-100 mb-4">
+
+                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                    <dl class="mb-0">
+                        <dt class="fs-3 fw-bold header-color">@TrendingSubject</dt>
+                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
+                    </dl>
+                    <div class="item item-rounded-lg bg-body-light">
+                        <i class="fa-solid fa-heart-circle-minus fs-3 text-warning"></i>
+                    </div>
+                </div>
+                <div class="bg-body-light rounded-bottom">
+                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
+                        <span role="button">Filter on Subject</span>
+                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <div class="block block-rounded d-flex flex-column h-100 mb-0">
             <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                 <ul>
@@ -51,73 +91,27 @@ else
                 </a>
             </div>
         </div>
-        <div class="block block-rounded d-flex flex-column h-100 mb-0">
 
-            <div>
-                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                    <dl class="mb-0">
-                        <dt class="fs-3 fw-bold header-color">@TrendingTopic</dt>
-                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Topic</dd>
-                    </dl>
-                    <div class="item item-rounded-lg bg-body-light">
-                        <i class="fa-solid fa-heart-circle-exclamation fs-3 text-danger"></i>
-                    </div>
-                </div>
-                <div class="bg-body-light rounded-bottom">
-                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Unhealthy').scrollIntoView({ behavior: 'smooth'})">
-                        <span role="button">Filter on Topic</span>
-                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                    </a>
-                </div>
-            </div>
+    </div>
 
-            <div>
-                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                    <dl class="mb-0">
-                        <dt class="fs-3 fw-bold header-color">@TrendingSubject</dt>
-                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
-                    </dl>
-                    <div class="item item-rounded-lg bg-body-light">
-                        <i class="fa-solid fa-heart-circle-minus fs-3 text-warning"></i>
-                    </div>
-                </div>
-                <div class="bg-body-light rounded-bottom">
-                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
-                        <span role="button">Filter on Subject</span>
-                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                    </a>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="block block-rounded d-flex flex-column h-100 mb-0">
-            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                <dl class="mb-0">
-                    <dt class="fs-3 fw-bold header-color">@AllItems.Count()</dt>
-                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Total Tweets</dd>
-                </dl>
-                <div class="item item-rounded-lg bg-body-light">
-                    <i class="fa-solid fa-heart-circle-check fs-3 text-success"></i>
-                </div>
-            </div>
-            <div class="bg-body-light rounded-bottom">
-                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Healthy').scrollIntoView({ behavior: 'smooth'})">
-                    <span role="button">View All</span>
-                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                </a>
-            </div>
+    @*Current Filters*@
+    <div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
+        <div class="row justify-content-around w-100">
+            @foreach (var tag in FilteredHashtags)
+            {
+                <span @onclick="(() => {RemoveFilter(tag);})" class="textClass fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success" style="width:auto;">@tag</span>
+            }
         </div>
     </div>
 
     @*Filtered Stream*@
     @if (IsFilterEnabled)
     {
-        <ItemGrouping Items="FilteredItems" IsFilteringEnabled="IsFilterEnabled" Filter="Filter" Callback="NavigateToDetails" />
+        <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Filters="FilteredHashtags" Callback="NavigateToDetails" />
     }
 
     @*Live Stream*@
-    <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" />
+    <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Callback="NavigateToDetails" />
 }
 
 <style>
@@ -126,7 +120,122 @@ else
         padding: 0; /* Remove padding */
         margin: 0; /* Remove margins */
     }
+
+    .form-control.form-control-date {
+        padding: 0;
+    }
+
+    .block-title {
+        flex: 1 1 auto;
+        min-height: 1.75rem;
+        margin: 0;
+        font-size: .875rem;
+        font-weight: 600;
+        line-height: 1.75rem;
+        text-transform: uppercase;
+        letter-spacing: .0625rem;
+    }
+
+    .block-content.block-content-full {
+        padding-bottom: 1.25rem;
+    }
+
+    .block-content {
+        transition: opacity .25s ease-out;
+        width: 100%;
+        margin: 0 auto;
+        padding: 1.25rem 1.25rem 1px;
+        overflow-x: visible;
+    }
+
+        .block-content.block-rounded > .block-header, .block.block-rounded > .nav-tabs {
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+        }
+
+    .block-header-default {
+        background-color: #f6f7f9;
+    }
+
+    .block-title {
+        flex: 1 1 auto;
+        min-height: 1.75rem;
+        margin: 0;
+        font-size: .875rem;
+        font-weight: 600;
+        line-height: 1.75rem;
+        text-transform: uppercase;
+        letter-spacing: .0625rem;
+        color: #334155;
+    }
+
+    .block-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.625rem 1.25rem;
+        transition: opacity 3s ease-out;
+    }
+
+    .textClass {
+        font-family: 'Open Sans', sans-serif;
+        padding: 5px 10px 5px 10px;
+        border-radius: 0rem;
+        align-items: center;
+        margin: 0;
+    }
+
+    .card-styles {
+        border-radius: 0.3rem;
+        background: #ffffff;
+        box--moz-box-shadow: 0 1px 2px rgb(214 219 226 / 50%), 0 1px 2px rgb(214 219 226 / 50%);
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+
+    .rounded-pill {
+        border-radius: 50rem !important;
+    }
+
+    .bg-success-light {
+        background-color: #e0edcf !important;
+    }
+
+    .text-success {
+        color: #65a30d !important;
+    }
+
+    .text-success {
+        --bs-text-opacity: 1;
+        color: rgba(var(--bs-success-rgb), var(--bs-text-opacity)) !important;
+    }
+
+    .text-info {
+        --bs-text-opacity: 1;
+        color: rgba(var(--bs-info-rgb), var(--bs-text-opacity)) !important;
+    }
+
+    .text-info {
+        color: #0891b2 !important;
+    }
+
+    .bg-info-light {
+        background-color: #cee9f0 !important;
+    }
+
+    .availability-spacing {
+        margin-top 30px;
+        height: 45vh;
+        display: flex;
+    }
+
+    .section-spacing {
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
 </style>
+
 @code {
     public List<TweetModel> AllItems { get; set; } = new();
     public List<TweetModel> FilteredLive { get; set; } = new();
@@ -146,9 +255,8 @@ else
             ToggleStream(value);
         }
     }
-    private bool _isStreamOpen;
+    private bool _isStreamOpen { get; set; } = true;
 
-    public List<string> AllTweets { get; set; } = new();
     public TweetModel Model { get; set; }
 
     // Popular Topic
@@ -157,6 +265,7 @@ else
     public Dictionary<Entity, int> Subjects { get; set; } = new();
 
     public List<string> TopHashtags { get; set; } = new();
+    public List<string> FilteredHashtags { get; set; } = new();
     public string TrendingTopic { get; set; } = string.Empty;
     public string TrendingSubject { get; set; } = string.Empty;
 
@@ -165,6 +274,23 @@ else
     protected override async Task OnInitializedAsync()
     {
         _twitterService.TweetReceived += ShowTweet;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            try
+            {
+                await _twitterService.StartStream();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Could not start stream: {ex}");
+            }
+        }
     }
 
     public async void ShowTweet(object sender, TweetEventReceived eventArgs)
@@ -183,38 +309,12 @@ else
 
     public TweetModel CreateTweet(TweetStreamData tweet)
     {
-        // Random Names, etc
-        Random nameRnd = new Random();
-        int num = nameRnd.Next();
-
-        Random chargeRnd = new Random();
-        int chargeNum = chargeRnd.Next(100);
-        int cycleNum = chargeRnd.Next(1000);
-
-        Array values = Enum.GetValues(typeof(HealthStatus));
-        Random statusRnd = new Random();
-        HealthStatus randomStatus = (HealthStatus)values.GetValue(statusRnd.Next(values.Length));
-
-        Random gen = new Random();
-        DateTime start = new DateTime(2016, 1, 1);
-        int range = (DateTime.Today - start).Days;
-        var rndDate = start.AddDays(gen.Next(range));
-
-        // Debug
-        if (tweet.data.context_annotations is not null && tweet.data.context_annotations.Count() > 1)
-        {
-            var test = 32;
-        }
-
         return new TweetModel()
             {
                 Id = tweet.data.id,
                 Text = tweet.data.text,
                 Language = tweet.data.lang,
-                Name = $"Tweet-{num}",
-                Status = randomStatus,
-                Model = "aero2A7B",
-                CreatedDate = rndDate,
+                Name = $"Tweet-{tweet.data.id}",
                 Domain = tweet.data.context_annotations is not null ? tweet.data.context_annotations.FirstOrDefault()?.domain : null,
                 Entity = tweet.data.context_annotations is not null ? tweet.data.context_annotations.FirstOrDefault()?.entity : null,
             };
@@ -285,23 +385,36 @@ else
         }
     }
 
-    public void NavigateToDetails(TweetModel tweet)
+    public async void NavigateToDetails(TweetModel tweet)
     {
         Model = tweet;
         IsItemDetails = true;
+        await _twitterService.StopStream();
         StateHasChanged();
     }
 
     public void SetPageStatus(bool isDetails)
     {
-        //IsItemDetails = isDetails;
+        IsItemDetails = isDetails;
         StateHasChanged();
     }
 
     public async Task SetFilters(string filter)
     {
         IsFilterEnabled = true;
-        Filter = filter;
+        FilteredHashtags.Add(filter);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task RemoveFilter(string filter)
+    {
+        FilteredHashtags.Remove(filter);
+
+        if (FilteredHashtags.Count() == 0)
+        {
+            IsFilterEnabled = false;
+        }
+
         await InvokeAsync(StateHasChanged);
     }
 

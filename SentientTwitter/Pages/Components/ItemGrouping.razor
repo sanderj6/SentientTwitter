@@ -1,12 +1,12 @@
 ﻿@using SentientTwitter.Data;
 @using SentientTwitter.Services;
 
-<div class="row" id="liveTweet">
+<div class="row" id="@StreamName">
     <div class="col-10 offset-1">
         <div class="card-styles">
 
             <div class="block-header block-header-default">
-                <h3 class="block-title">Live Stream - @Items.Count()</h3>
+                <h3 class="block-title">@StreamName Stream - @Items.Count()</h3>
             </div>
 
             @if (!Items.Any())
@@ -22,17 +22,22 @@
                 <div style="max-height:@FilteredCSS; overflow-y:scroll;">
                     @if (Items.Count() > 0)
                     {
-                        <Virtualize Items="Items" Context="item">
-                            <div class="row textClass" @onclick="(() => {ItemClickCallback(item);})">
-                                <div class="col-5 text-center">@item.Text</div>
-                                <div class="col-1 text-center">Positive</div>
-                                <div class="col-3">
-                                    @item.Domain?.name
+                        <Virtualize Items="Items" Context="item" ItemSize="50">
+                            <ItemContent>
+                                <div class="row textClass" @onclick="(() => {ItemClickCallback(item);})">
+                                    <div class="col-5 text-center">@item.Text</div>
+                                    <div class="col-1 text-center">Positive</div>
+                                    <div class="col-3">
+                                        @item.Domain?.name
+                                    </div>
+                                    <div class="col-3">
+                                        @item.Entity?.name
+                                    </div>
                                 </div>
-                                <div class="col-3">
-                                    @item.Entity?.name
-                                </div>
-                            </div>
+                            </ItemContent>
+                            <Placeholder>
+                                <p>Loading tweet details...</p>
+                            </Placeholder>
                         </Virtualize>
                     }
                 </div>
@@ -55,30 +60,25 @@
     public bool IsFilteringEnabled { get; set; }
 
     [Parameter]
-    public string Filter
+    public List<string> Filters
     {
-        get { return _filter; }
+        get { return _filters; }
         set
         {
-            _filter = value;
-            FilterTweets(_filter);
+            _filters = value;
+            FilterTweets(_filters);
         }
+
     }
-    private string _filter;
+    private List<string> _filters;
 
-    public string FilteredCSS => IsFilteringEnabled ? "20rem" : "40rem";
+    public string FilteredCSS => IsFilteringEnabled ? "10rem" : "20rem";
+    public string StreamName => Filters is not null ? "Filtered" : "Live";
 
-    protected override async Task OnInitializedAsync()
+    public async Task FilterTweets(List<string> _filters)
     {
-        await base.OnInitializedAsync();
-        FilterItems = Items.Where(x => x.Text.ToUpper().Contains(Filter)).ToList();
-        //var test = await _twitterService.StartStream();
-    }
-
-
-    public async Task FilterTweets(string filter){
-        //Items = Items.Where(x => x.Text.ToUpper().Contains(filter)).ToList();
-        //await InvokeAsync(StateHasChanged);
+        Items = Items.Where(x => Filters.Any(y => x.Text.ToUpper().Trim().Contains(y.ToUpper().Trim()))).ToList();
+        await InvokeAsync(StateHasChanged);
     }
 
     public async void ItemClickCallback(TweetModel tweet)

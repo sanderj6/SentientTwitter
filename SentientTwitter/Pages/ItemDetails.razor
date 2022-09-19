@@ -3,6 +3,7 @@
 @using SentientTwitter.Services;
 @inject IJSRuntime JsRuntime
 @inject ModalService _modalService
+@inject TextAnalyzerService _textAnalyzerService
 
 <div class="position-fixed">
     <span>
@@ -14,11 +15,10 @@
 <div class="offset-1 col-10 section-spacing d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
     <div class="flex-grow-1 mb-1 mb-md-0">
         <h1>
-            @*<img src="../css/images/aeroicon.svg" height="40" width="50" />*@
-            @Model.Name
+            Tweet Deets
         </h1>
         <h2 class="h6 fw-medium text-muted mb-0">
-            @Model.Model - @Model.Id
+            @Model.Id
         </h2>
     </div>
 </div>
@@ -30,7 +30,7 @@
         <div class="col-6" style="overflow-y:hidden;">
             <div class="card-styles" style="height:100%;">
                 <div class="block-header block-header-default">
-                    <h3 class="block-title">Item Details</h3>
+                    <h3 class="block-title">Tweet Details</h3>
                 </div>
 
                 <div class="mt-4">
@@ -41,66 +41,6 @@
                         <div class="col-6">
                             <span class="text-details text-muted">
                                 @Model.Name
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row textClass justify-content-between">
-                        <div class="col-4">
-                            Status
-                        </div>
-                        <div class="col-6">
-                            <span class="text-details text-muted">
-                                @Model.Status
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row textClass justify-content-between">
-                        <div class="col-4">
-                            Live
-                        </div>
-                        <div class="col-6">
-                            <span class="text-details text-muted">
-                                @Model.IsLive
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row textClass justify-content-between">
-                        <div class="col-4">
-                            Model
-                        </div>
-                        <div class="col-6">
-                            <span class="text-details text-muted">
-                                @Model.Model
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row textClass justify-content-between">
-                        <div class="col-4">
-                            Serial
-                        </div>
-                        <div class="col-6">
-                            <span class="text-details text-muted">
-                                1A5D8FG1H3TJ9STG5S
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row textClass justify-content-between">
-                        <div class="col-4">
-                            In Service Date
-                        </div>
-                        <div class="col-6">
-                            <span class="text-details text-muted">
-                                @DateTime.Now.AddDays(-643)
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row textClass justify-content-between">
-                        <div class="col-4">
-                            Est Expiry Date
-                        </div>
-                        <div class="col-6">
-                            <span class="text-details text-muted">
-                                @DateTime.Now.AddDays(782)
                             </span>
                         </div>
                     </div>
@@ -246,7 +186,7 @@
             </div>
         </div>
 
-        @*BATTERY HISTORY*@
+        @*HISTORY*@
         <div class="col-9">
             <div class="card-styles">
 
@@ -264,42 +204,6 @@
 
     </div>
 
-    @*RECORDS*@
-    <div class="row">
-
-        <div class="col-12">
-            <div class="card-styles">
-
-                <div class="block-header block-header-default">
-                    <div class="block-title block-options space-x-1 textClass col-6">
-                        Records
-                    </div>
-                </div>
-
-                <div class="block-options space-x-1 textClass" style="width: 100%; text-align: right;">
-                    <button @onclick="(() => {IsSearchVisible = !IsSearchVisible;})" type="button" class="btn btn-sm btn-alt-secondary js-class-toggle-enabled" data-toggle="class-toggle" data-target="#one-dashboard-search-orders" data-class="d-none">
-                        <i class="fa fa-search"></i>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-md-end dropdown-menu-end fs-sm" aria-labelledby="dropdown-recent-orders-filters">
-                        @foreach (var status in Enum.GetValues<HealthStatus>())
-                        {
-                            <a @onclick="(() => {FilterStatus = status;})" class="dropdown-item fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
-                                @status
-                                <span class="badge bg-primary rounded-pill">235</span>
-                            </a>
-                        }
-                    </div>
-                </div>
-
-                @if (AllRecords.Any())
-                {
-                    <SentientTwitter.Pages.Components.DataTable Titem="FlightRecord" AllItems="AllRecords" Callback="ShowMessageModal" IsSearchVisible="IsSearchVisible"></SentientTwitter.Pages.Components.DataTable>
-                }
-
-            </div>
-        </div>
-
-    </div>
 </div>
 
 <style>
@@ -468,8 +372,6 @@
     public List<ChartData> BarChartData { get; set; }
     public Decimal[] Percentages { get; set; }
 
-    public List<FlightRecord> AllRecords { get; set; } = new();
-
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -480,24 +382,6 @@
         TimeSpan end = TimeSpan.FromHours(11);
         int maxMinutes = (int)((end - start).TotalMinutes);
 
-        for (int i = 0; i < 10000; i++)
-        {
-            int minutes = random.Next(maxMinutes);
-            TimeSpan t = start.Add(TimeSpan.FromMinutes(minutes));
-
-            var newRecord = new FlightRecord()
-                {
-                    Id = Guid.NewGuid(),
-                    TweetId = Guid.NewGuid(),
-                    Duration = t,
-                    LocationX = 39.72738M,
-                    LocationY = 72.11786M,
-                    Status = HealthStatus.Healthy,
-                    Message = "Test Message"
-                };
-
-            AllRecords.Add(newRecord);
-        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -509,7 +393,7 @@
             try
             {
                 ChartsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", new CancellationToken(), "./js/GeneratedJS/ItemCharts.js");
-
+                Model.Sentiment = await _textAnalyzerService.AnalyzeText(Model.Text);
                 RenderCharts();
             }
             catch (Exception ex)
@@ -550,24 +434,6 @@
         catch (Exception ex)
         {
             // log error
-        }
-    }
-
-    public void ShowMessageModal<FlightRecord>(FlightRecord record)
-    {
-        try
-        {
-            _modalService.Show<FlightRecord, bool>($"Flight Details", "modal-tiny", true, typeof(SentientTwitter.Pages.Components.FlightRecordModal), record, callback =>
-            {
-                // blah
-                var test = 123;
-            });
-
-        }
-        catch (Exception ex)
-        {
-            // err
-            var test2 = 123;
         }
     }
 

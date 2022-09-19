@@ -8,32 +8,10 @@ namespace SentientTwitter.Data
         public string Text { get; set; }
         public string Language { get; set; }
         public string Name { get; set; }
-        public string Model { get; set; }
-        public string SerialNumber { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
-        public bool IsLive { get; set; }
-        public Guid OwnerId { get; set; }
-        public Guid LastKnownBattery { get; set; }
-        public HealthStatus Status { get; set; }
         public Domain Domain { get; set; }
         public Entity Entity { get; set; }
         public DocumentSentiment Sentiment { get; set; }
-    }
-
-    public class FlightRecord
-    {
-        public Guid Id { get; set; }
-        public Guid TweetId { get; set; }
-        public TimeSpan Duration { get; set; }
-        public decimal LocationX { get; set; }
-        public decimal LocationY { get; set; }
-        public string Message { get; set; }
-        public HealthStatus Status { get; set; }
-    }
-
-    public class TweetRequest
-    {
-
     }
 
     public enum HealthStatus
@@ -54,7 +32,6 @@ namespace SentientTwitter.Data
     }
 
     // API Call Models
-
     public class TweetSearchResponse
     {
         public Datum[] data { get; set; }

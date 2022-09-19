@@ -12,7 +12,7 @@ public class SentimentRecordDbContext : DbContext
 
     }
 
-    public DbSet<SentimentRecord> FlightRecords { get; set; }
+    public DbSet<SentimentRecord> TweetRecords { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
