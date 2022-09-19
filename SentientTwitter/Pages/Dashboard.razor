@@ -6,113 +6,219 @@
 @using static SentientTwitter.Services.TwitterService
 @inject NavigationManager _navigationManager
 @inject TwitterService _twitterService
+@inject TextAnalyzerService _textAnalyzerService
 
-@if (IsItemDetails)
-{
-    <ItemDetails Model="Model" Callback="SetPageStatus" />
-}
-else
-{
-    @*HEADER*@
-    <div class="offset-1 col-10 section-spacing d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
-        <div class="flex-grow-1 mb-1 mb-md-0">
-            <h1>
-                Tweet Fleet
-            </h1>
-            <h2 class="h6 fw-medium text-muted mb-0">
-                Real-time Twitter stream with Tweet Sentiment
-            </h2>
-        </div>
-
-        <div class="float-end">
-            <label class="switch">
-                <input type="checkbox" @bind="IsStreamOpen">
-                <span class="slider round"></span>
-            </label>
-        </div>
+@*HEADER*@
+<div class="offset-1 col-10 section-spacing d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
+    <div class="flex-grow-1 mb-1 mb-md-0">
+        <h1>
+            Tweet Fleet
+        </h1>
+        <h2 class="h6 fw-medium text-muted mb-0">
+            Real-time Twitter stream with Tweet Sentiment
+        </h2>
     </div>
 
-    @*KPIs*@
-    <div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
+    <div class="float-end">
+        <label class="switch">
+            <input type="checkbox" @bind="IsStreamOpen">
+            <span class="slider round"></span>
+        </label>
+    </div>
+</div>
 
-        <div class="d-flex flex-column justify-content-between">
-            <div class="block block-rounded d-flex flex-column h-100 mb-4">
-                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                    <dl class="mb-0">
-                        <dt class="fs-3 fw-bold header-color">@AllItems.Count()</dt>
-                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Total Tweets</dd>
-                    </dl>
-                    <div class="item item-rounded-lg bg-body-light">
-                        <i class="fa-solid fa-heart-circle-check fs-3 text-success"></i>
-                    </div>
-                </div>
-                <div class="bg-body-light rounded-bottom">
-                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Healthy').scrollIntoView({ behavior: 'smooth'})">
-                        <span role="button">View All</span>
-                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                    </a>
-                </div>
-            </div>
+@*KPIs*@
+<div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
 
-            <div class="block block-rounded d-flex flex-column h-100 mb-4">
-
-                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                    <dl class="mb-0">
-                        <dt class="fs-3 fw-bold header-color">@TrendingSubject</dt>
-                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
-                    </dl>
-                    <div class="item item-rounded-lg bg-body-light">
-                        <i class="fa-solid fa-heart-circle-minus fs-3 text-warning"></i>
-                    </div>
-                </div>
-                <div class="bg-body-light rounded-bottom">
-                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
-                        <span role="button">Filter on Subject</span>
-                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="block block-rounded d-flex flex-column h-100 mb-0">
+    <div class="d-flex flex-column justify-content-between">
+        <div class="block block-rounded d-flex flex-column h-100 mb-4">
             <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                <ul>
-                    <Virtualize Items="TopHashtags" Context="hashtag">
-                        <li class="row textClass" @onclick="(async() => {await SetFilters(hashtag);})">
-                            @hashtag
-                        </li>
-                    </Virtualize>
-                </ul>
+                <dl class="mb-0">
+                    <dt class="fs-3 fw-bold header-color">@AllItems.Count()</dt>
+                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Total Tweets</dd>
+                </dl>
+                <div class="item item-rounded-lg bg-body-light">
+                    <i class="fa-solid fa-heart-circle-check fs-3 text-success"></i>
+                </div>
             </div>
             <div class="bg-body-light rounded-bottom">
-                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
-                    <span role="button">View Top Hashtags</span>
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Healthy').scrollIntoView({ behavior: 'smooth'})">
+                    <span role="button">View All</span>
                     <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                 </a>
             </div>
         </div>
 
+        <div class="block block-rounded d-flex flex-column h-100 mb-4">
+
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                <dl class="mb-0">
+                    <dt class="fs-3 fw-bold header-color">@TrendingSubject</dt>
+                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
+                </dl>
+                <div class="item item-rounded-lg bg-body-light">
+                    <i class="fa-solid fa-heart-circle-minus fs-3 text-warning"></i>
+                </div>
+            </div>
+            <div class="bg-body-light rounded-bottom">
+                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
+                    <span role="button">Filter on Subject</span>
+                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                </a>
+            </div>
+        </div>
     </div>
 
-    @*Current Filters*@
-    <div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
-        <div class="row justify-content-around w-100">
-            @foreach (var tag in FilteredHashtags)
+    <div class="block block-rounded d-flex flex-column h-100 mb-4">
+        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+            <ul>
+                <Virtualize Items="TopHashtags" Context="hashtag">
+                    <ItemContent>
+                        <li class="row textClass" @onclick="(async() => {await SetFilters(hashtag);})">
+                            @hashtag
+                        </li>
+                    </ItemContent>
+                    <Placeholder>
+                        <p>No hashtags to display...</p>
+                    </Placeholder>
+                </Virtualize>
+            </ul>
+        </div>
+        <div class="bg-body-light rounded-bottom">
+            <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" onclick="document.getElementById('Degraded').scrollIntoView({ behavior: 'smooth'})">
+                <span role="button">View Top Hashtags</span>
+                <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+            </a>
+        </div>
+    </div>
+
+    @*TWEET DETAILS*@
+    <div class="col-xl-6 col-sm-12">
+        <div class="card-styles" style="height:100%;">
+            <div class="block-header block-header-default bg-info-light">
+                <h3 class="block-title text-info">Snapshot</h3>
+            </div>
+            @if (Model is null)
             {
-                <span @onclick="(() => {RemoveFilter(tag);})" class="textClass fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success" style="width:auto;">@tag</span>
+                <p class="text-center fw-bold mt-4">Please select a tweet to analyze!</p>
+            }
+            else
+            {
+                <div class="flex-grow-1 d-flex align-items-center p-3">
+                    <div class="row align-items-center w-100">
+                        <div class="col-6 text-center textClass align-content-center fst-italic">
+                            <p>@Model?.Text</p>
+                        </div>
+
+                        <div class="col-6" style="text-align:end;">
+                            @if (Model is not null && Model.Sentiment is not null)
+                            {
+                                <div class="row textClass justify-content-between">
+                                    <div class="col-4">
+                                        Sentiment
+                                    </div>
+                                    <div class="col-6 text-break">
+                                        <span class="col-6 text-break text-details text-muted fw-bold">
+                                            @Model.Sentiment.Sentiment
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="row textClass justify-content-between">
+                                    <div class="col-4">
+                                        Positive Score
+                                    </div>
+                                    <div class="col-6 text-break">
+                                        <span class="col-6 text-break text-details text-muted">
+                                            @Model.Sentiment.ConfidenceScores.Positive
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="row textClass justify-content-between">
+                                    <div class="col-4">
+                                        Neutral Score
+                                    </div>
+                                    <div class="col-6 text-break">
+                                        <span class="col-6 text-break text-details text-muted">
+                                            @Model.Sentiment.ConfidenceScores.Neutral
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="row textClass justify-content-between">
+                                    <div class="col-4">
+                                        Negative Score
+                                    </div>
+                                    <div class="col-6 text-break">
+                                        <span class="col-6 text-break text-details text-muted">
+                                            @Model.Sentiment.ConfidenceScores.Negative
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.Entities is not null)
+                {
+                    <div class="flex-grow-1 d-flex align-items-center p-3 justify-content-around flex-wrap">
+                        @if (Model.Entities.urls is not null)
+                        {
+                            @foreach (var url in Model.Entities.urls)
+                            {
+                                <div class="row text-center textClass fst-italic">
+                                    <p>@url.url</p>
+                                </div>
+                            }
+                        }
+
+                        @if (Model.Entities.hashtags is not null)
+                        {
+                            @foreach (var tag in Model.Entities.hashtags)
+                            {
+                                <div class="row text-center textClass fst-italic">
+                                    <p>@tag.tag</p>
+                                </div>
+                            }
+                        }
+
+                        @if (Model.Entities.mentions is not null)
+                        {
+                            @foreach (var mention in Model.Entities.mentions)
+                            {
+                                <div class="row text-center textClass fst-italic">
+                                    <p>@mention.username</p>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
             }
         </div>
     </div>
 
-    @*Filtered Stream*@
-    @if (IsFilterEnabled)
-    {
-        <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Filters="FilteredHashtags" Callback="NavigateToDetails" />
-    }
+</div>
 
-    @*Live Stream*@
-    <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Callback="NavigateToDetails" />
+@*Current Filters*@
+<div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
+    <div class="row justify-content-around w-100">
+        @foreach (var tag in FilteredHashtags)
+        {
+            <span @onclick="(() => {RemoveFilter(tag);})" class="textClass fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success" style="width:auto;">@tag</span>
+        }
+    </div>
+</div>
+
+@*Filtered Stream*@
+@if (IsFilterEnabled)
+{
+    <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Filters="FilteredHashtags" Callback="NavigateToDetails" />
 }
+
+@*Live Stream*@
+<ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Callback="NavigateToDetails" />
 
 <style>
     ul.no-bullets {
@@ -190,8 +296,6 @@ else
         border-radius: 0.3rem;
         background: #ffffff;
         box--moz-box-shadow: 0 1px 2px rgb(214 219 226 / 50%), 0 1px 2px rgb(214 219 226 / 50%);
-        margin-top: 25px;
-        margin-bottom: 25px;
     }
 
     .rounded-pill {
@@ -317,6 +421,7 @@ else
                 Name = $"Tweet-{tweet.data.id}",
                 Domain = tweet.data.context_annotations is not null ? tweet.data.context_annotations.FirstOrDefault()?.domain : null,
                 Entity = tweet.data.context_annotations is not null ? tweet.data.context_annotations.FirstOrDefault()?.entity : null,
+                Entities = tweet.data.entities
             };
     }
 
@@ -388,8 +493,7 @@ else
     public async void NavigateToDetails(TweetModel tweet)
     {
         Model = tweet;
-        IsItemDetails = true;
-        await _twitterService.StopStream();
+        Model.Sentiment = await _textAnalyzerService.AnalyzeText(tweet.Text);
         StateHasChanged();
     }
 

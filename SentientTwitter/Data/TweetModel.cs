@@ -11,6 +11,7 @@ namespace SentientTwitter.Data
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public Domain Domain { get; set; }
         public Entity Entity { get; set; }
+        public Entities Entities { get; set; }
         public DocumentSentiment Sentiment { get; set; }
     }
 
