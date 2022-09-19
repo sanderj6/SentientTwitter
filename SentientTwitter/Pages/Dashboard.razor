@@ -1,14 +1,11 @@
 ﻿@page "/"
+@inherits PageBase<Dashboard>
 @using Newtonsoft.Json;
 @using SentientTwitter.Pages.Components;
 @using SentientTwitter.Data;
 @using SentientTwitter.Services;
 @using System.Diagnostics;
 @using static SentientTwitter.Services.TwitterService
-
-@inject TwitterService _twitterService
-@inject TextAnalyzerService _textAnalyzerService
-@inject IJSRuntime JsRuntime
 
 @*HEADER*@
 <div class="offset-1 col-10 section-spacing d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
