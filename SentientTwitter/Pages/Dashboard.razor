@@ -97,7 +97,7 @@
             <div class="block-header block-header-default bg-info-light">
                 <h3 class="block-title text-info">Snapshot</h3>
             </div>
-            @if (Model is null)
+            @if (string.IsNullOrWhiteSpace(Model.Text))
             {
                 <div class="flex-grow-1 d-flex align-items-center justify-content-center p-3">
                     <p class="text-center fw-bold mt-4">Please select a tweet to analyze!</p>
