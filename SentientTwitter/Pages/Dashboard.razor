@@ -339,82 +339,72 @@
     // Calculate Hashtags, Domains, and Subjects
     public async Task CalculateTrending(TweetStreamData tweetStream)
     {
-        // Calculate tranding via tasks to be more performant
-        var tasks = new List<Task>();
-
-        // Hashtags
-        tasks.Add(Task.Run(() =>
-           {
-               if (tweetStream.data.entities is not null)
-               {
-                   var hashtags = tweetStream.data.entities.hashtags;
-                   if (hashtags is not null)
-                   {
-                       foreach (var tag in hashtags)
-                       {
-                           var matchTag = HashTags.Where(x => x.Key.tag.ToUpper().Trim() == tag?.tag.ToUpper().Trim()).FirstOrDefault();
-                           if (matchTag.Key is null)
-                           {
-                               HashTags.Add(tag, 1);
-                           }
-                           else
-                           {
-                               HashTags[matchTag.Key] = matchTag.Value + 1;
-                           }
-                       }
-                   }
-
-                   TopHashtags = HashTags.OrderByDescending(x => x.Value).Select(y => y.Key.tag).Take(10).ToList();
-               }
-           }));
-
-        // DOMAIN and ENTITY
-        tasks.Add(Task.Run(() =>
-           {
-               if (tweetStream.data.context_annotations is not null)
-               {
-                   foreach (var context in tweetStream.data.context_annotations)
-                   {
-                       // TOPIC
-                       var topic = context.domain;
-                       if (topic is not null)
-                       {
-                           var match = Topics.Where(x => x.Key.name.ToUpper().Trim() == topic?.name.ToUpper().Trim()).FirstOrDefault();
-                           if (match.Key is null)
-                           {
-                               Topics.Add(topic, 1);
-                           }
-                           else
-                           {
-                               Topics[match.Key] = match.Value + 1;
-                           }
-
-                           TrendingTopic = Topics.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
-                       }
-
-                       // SUBJECT
-                       var subject = context.entity;
-                       if (subject is not null)
-                       {
-                           var match = Subjects.Where(x => x.Key.name.ToUpper().Trim() == subject?.name.ToUpper().Trim()).FirstOrDefault();
-                           if (match.Key is null)
-                           {
-                               Subjects.Add(subject, 1);
-                           }
-                           else
-                           {
-                               Subjects[match.Key] = match.Value + 1;
-                           }
-
-                           TrendingSubject = Subjects.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
-                       }
-                   }
-               }
-           }));
-
         try
         {
-            await Task.WhenAll(tasks.ToArray());
+            // Hashtags
+            if (tweetStream.data.entities is not null)
+            {
+                var hashtags = tweetStream.data.entities.hashtags;
+                if (hashtags is not null)
+                {
+                    foreach (var tag in hashtags)
+                    {
+                        var matchTag = HashTags.Where(x => x.Key.tag.ToUpper().Trim() == tag?.tag.ToUpper().Trim()).FirstOrDefault();
+                        if (matchTag.Key is null)
+                        {
+                            HashTags.Add(tag, 1);
+                        }
+                        else
+                        {
+                            HashTags[matchTag.Key] = matchTag.Value + 1;
+                        }
+                    }
+                }
+
+                TopHashtags = HashTags.OrderByDescending(x => x.Value).Select(y => y.Key.tag).Take(10).ToList();
+            }
+
+            // DOMAIN and ENTITY
+            if (tweetStream.data.context_annotations is not null)
+            {
+                foreach (var context in tweetStream.data.context_annotations)
+                {
+                    // TOPIC
+                    var topic = context.domain;
+                    if (topic is not null)
+                    {
+                        var match = Topics.Where(x => x.Key.name.ToUpper().Trim() == topic?.name.ToUpper().Trim()).FirstOrDefault();
+                        if (match.Key is null)
+                        {
+                            Topics.Add(topic, 1);
+                        }
+                        else
+                        {
+                            Topics[match.Key] = match.Value + 1;
+                        }
+
+                        TrendingTopic = Topics.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
+                    }
+
+                    // SUBJECT
+                    var subject = context.entity;
+                    if (subject is not null)
+                    {
+                        var match = Subjects.Where(x => x.Key.name.ToUpper().Trim() == subject?.name.ToUpper().Trim()).FirstOrDefault();
+                        if (match.Key is null)
+                        {
+                            Subjects.Add(subject, 1);
+                        }
+                        else
+                        {
+                            Subjects[match.Key] = match.Value + 1;
+                        }
+
+                        TrendingSubject = Subjects.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
+                    }
+                }
+            }
+
         }
         catch (Exception ex)
         {
