@@ -112,5 +112,5 @@ public class TwitterService
     {
         IsStreamOpen = false;
         await this.StartStream();
-    }
+    }    
 }

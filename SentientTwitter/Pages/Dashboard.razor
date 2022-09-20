@@ -318,18 +318,18 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    // Convert from stream to Tweet Model
-    public TweetModel CreateTweetFromStream(TweetStreamData tweet)
+    // Convert from Stream to Tweet Model
+    public TweetModel CreateTweetFromStream(TweetStreamData stream)
     {
         return new TweetModel()
             {
-                Id = tweet.data.id,
-                Text = tweet.data.text,
-                Language = tweet.data.lang,
-                Name = $"Tweet-{tweet.data.id}",
-                Domain = tweet.data.context_annotations is not null ? tweet.data.context_annotations.FirstOrDefault()?.domain : null,
-                Entity = tweet.data.context_annotations is not null ? tweet.data.context_annotations.FirstOrDefault()?.entity : null,
-                Entities = tweet.data.entities
+                Id = stream.data.id,
+                Text = stream.data.text,
+                Language = stream.data.lang,
+                Name = $"Tweet-{stream.data.id}",
+                Domain = stream.data.context_annotations is not null ? stream.data.context_annotations.FirstOrDefault()?.domain : null,
+                Entity = stream.data.context_annotations is not null ? stream.data.context_annotations.FirstOrDefault()?.entity : null,
+                Entities = stream.data.entities
             };
     }
 
@@ -412,12 +412,19 @@
     // Analyze Sentiment and Render Chart
     public async void ShowDetails(TweetModel tweet)
     {
-        Model = tweet;
-        Model.Sentiment = await _textAnalyzerService.AnalyzeText(tweet.Text);
-        StateHasChanged();
+        try
+        {
+            Model = tweet;
+            Model.Sentiment = await _textAnalyzerService.AnalyzeText(tweet.Text);
+            StateHasChanged();
 
-        ChartsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", new CancellationToken(), "./js/GeneratedJS/ItemCharts.js");
-        RenderCharts();
+            ChartsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", new CancellationToken(), "./js/GeneratedJS/ItemCharts.js");
+            RenderCharts();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Issue showing tweet details: {ex}");
+        }
     }
 
     public async Task SetFilters(string filter, bool isAllFilters = false)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using SentientTwitter.CosmosDB;
 using SentientTwitter.Services;
 using System;
 
@@ -13,6 +14,7 @@ namespace SentientTwitter.Pages
         protected TextAnalyzerService _textAnalyzerService { get; set; }
         [Inject]
         protected IJSRuntime JsRuntime { get; set; }
-
+        [Inject]
+        protected TwitterRecordDbContext _dbContext { get; set; }
     }
 }

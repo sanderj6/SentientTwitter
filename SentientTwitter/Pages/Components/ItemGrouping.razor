@@ -20,7 +20,7 @@
             else
             {
                 <div style="max-height:@FilteredCSS; overflow-y:scroll;">
-                    @if (Items.Count() > 0)
+                    @if (Items.Any())
                     {
                         <Virtualize Items="Items" Context="item" ItemSize="50">
                             <ItemContent>
@@ -51,8 +51,6 @@
     [Parameter]
     public List<TweetModel> Items { get; set; } = new();
 
-    public List<TweetModel> FilterItems { get; set; } = new();
-
     [Parameter]
     public Action<TweetModel> Callback { get; set; }
 
@@ -72,8 +70,8 @@
     }
     private List<string> _filters;
 
-    public string FilteredCSS => IsFilteringEnabled ? "20rem" : "20rem";
     public string StreamName => Filters is not null ? "Filtered" : "Live";
+    public string FilteredCSS => IsFilteringEnabled ? "20rem" : "20rem";
 
     public async Task FilterTweets(List<string> _filters)
     {
