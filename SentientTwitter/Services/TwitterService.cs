@@ -72,8 +72,6 @@ public class TwitterService
                 using (var stream = await response.Content.ReadAsStreamAsync())
                 using (var streamReader = new StreamReader(stream))
                 {
-                    var serializer = new JsonSerializer();
-
                     // Process the response.
                     while (!streamReader.EndOfStream && IsStreamOpen)
                     {
