@@ -1,5 +1,7 @@
 ﻿@using SentientTwitter.Data;
 @using SentientTwitter.Services;
+@using System.Diagnostics;
+@using static SentientTwitter.Services.TwitterService;
 
 <div class="row" id="@StreamName">
     <div class="col-10 offset-1">
@@ -22,7 +24,7 @@
                 <div style="max-height:@FilteredCSS; overflow-y:scroll;">
                     @if (Items.Any())
                     {
-                        <Virtualize Items="Items" Context="item" ItemSize="50">
+                        <Virtualize @ref="virtualizeComponent" Context="item" ItemSize="50" OverscanCount="10" ItemsProvider="LoadProductDetails">
                             <ItemContent>
                                 <div class="row textClass" @onclick="(() => {ItemClickCallback(item);})">
                                     <div class="col-6 text-center">@item.Text</div>
@@ -48,6 +50,9 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    public TwitterService TwitterService { get; set; }
+
     [Parameter]
     public List<TweetModel> Items { get; set; } = new();
 
@@ -73,6 +78,46 @@
     public string StreamName => Filters is not null ? "Filtered" : "Live";
     public string FilteredCSS => IsFilteringEnabled ? "20rem" : "20rem";
 
+    private Virtualize<TweetModel>? virtualizeComponent { get; set; }
+
+    //protected override void OnInitialized()
+    //{
+    //    TwitterService.TweetReceived += async (object sender, TweetEventReceived eventArgs) =>
+    //    {
+    //        await InvokeAsync(async () =>
+    //        {
+    //            if (virtualizeComponent == null) return;
+    //            await virtualizeComponent?.RefreshDataAsync();
+    //            StateHasChanged();
+    //        });
+    //    };
+    //}
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            try
+            {
+                TwitterService.TweetReceived += async (object sender, TweetEventReceived eventArgs) =>
+                     {
+                         await InvokeAsync(async () =>
+                         {
+                             if (virtualizeComponent == null) return;
+                             await virtualizeComponent?.RefreshDataAsync();
+                             StateHasChanged();
+                         });
+                     };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Could not start stream: {ex}");
+            }
+        }
+    }
+
     public async Task FilterTweets(List<string> _filters)
     {
         Items = Items.Where(x => Filters.Any(y => x.Text.ToUpper().Trim().Contains(y.ToUpper().Trim()))).ToList();
@@ -83,4 +128,23 @@
     {
         Callback?.Invoke(tweet);
     }
+
+    private async ValueTask<ItemsProviderResult<TweetModel>> LoadProductDetails(ItemsProviderRequest request)
+    {
+        try
+        {
+
+            var totalCount = TwitterService.AllTweets.Count();
+            var numProducts = Math.Min(request.Count, totalCount - request.StartIndex);
+            var results = TwitterService.AllTweets.Skip(request.StartIndex).Take(numProducts);
+
+            return new ItemsProviderResult<TweetModel>(results, totalCount);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Issue displaying tweets on grid: {ex}");
+            return new ItemsProviderResult<TweetModel>();
+        }
+    }
+
 }

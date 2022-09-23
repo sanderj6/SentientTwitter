@@ -20,7 +20,7 @@
 
     <div class="float-end">
         <label class="switch">
-            <input type="checkbox" @bind="IsStreamOpen" disabled>
+            <input type="checkbox" @bind="_twitterService.IsStreamOpen" disabled>
             <span class="slider round"></span>
         </label>
     </div>
@@ -33,7 +33,7 @@
         <div class="block block-rounded d-flex flex-column h-100 mb-4">
             <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                 <dl class="mb-0">
-                    <dt class="fs-3 fw-bold header-color">@AllItems.Count()</dt>
+                    <dt class="fs-3 fw-bold header-color">@_twitterService.AllTweets.Count()</dt>
                     <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Total Tweets</dd>
                 </dl>
                 <div class="item item-rounded-lg bg-body-light">
@@ -52,7 +52,7 @@
 
             <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                 <dl class="mb-0">
-                    <dt class="fs-3 fw-bold header-color">@TrendingSubject</dt>
+                    <dt class="fs-3 fw-bold header-color">@_twitterService.TrendingSubject</dt>
                     <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
                 </dl>
             </div>
@@ -68,7 +68,7 @@
     <div class="block block-rounded d-flex flex-column h-100 mb-4 align-self-center">
         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
             <ul>
-                <Virtualize Items="TopHashtags" Context="hashtag">
+                <Virtualize Items="@_twitterService.TopHashtags" Context="hashtag">
                     <ItemContent>
                         <li class="row textClass" @onclick="(async() => {await SetFilters(hashtag);})">
                             #@hashtag
@@ -94,7 +94,7 @@
             <div class="block-header block-header-default bg-info-light">
                 <h3 class="block-title text-info">Snapshot</h3>
             </div>
-            @if (string.IsNullOrWhiteSpace(Model.Text))
+            @if (string.IsNullOrWhiteSpace(SelectedModel.Text))
             {
                 <div class="flex-grow-1 d-flex align-items-center justify-content-center p-3">
                     <p class="text-center fw-bold mt-4">Please select a tweet to analyze!</p>
@@ -105,11 +105,11 @@
                 <div class="flex-grow-1 d-flex align-items-center p-3">
                     <div class="row align-items-center w-100">
                         <div class="col-6 text-center textClass align-content-center fst-italic">
-                            <p>@Model?.Text</p>
+                            <p>@SelectedModel?.Text</p>
                         </div>
 
                         <div class="col-6" style="text-align:end;">
-                            @if (Model is not null && Model.Sentiment is not null)
+                            @if (SelectedModel is not null && SelectedModel.Sentiment is not null)
                             {
                                 <div class="row textClass justify-content-between">
                                     <div class="col-4">
@@ -117,12 +117,12 @@
                                     </div>
                                     <div class="col-6 text-break">
                                         <span class="col-6 text-break text-details text-muted fw-bold">
-                                            @Model.Sentiment.Sentiment
+                                            @SelectedModel.Sentiment.Sentiment
                                         </span>
                                     </div>
                                 </div>
 
-                                <div class="row textClass justify-content-between">
+                                <div class="row justify-content-between">
                                     <canvas id="chartjs-pie"></canvas>
                                 </div>
                             }
@@ -130,12 +130,12 @@
                     </div>
                 </div>
 
-                @if (Model.Entities is not null)
+                @if (SelectedModel.Entities is not null)
                 {
                     <div class="flex-grow-1 d-flex align-items-center p-3 justify-content-around flex-wrap">
-                        @if (Model.Entities.urls is not null)
+                        @if (SelectedModel.Entities.urls is not null)
                         {
-                            @foreach (var url in Model.Entities.urls)
+                            @foreach (var url in SelectedModel.Entities.urls)
                             {
                                 <div class="row text-center textClass fst-italic">
                                     <p>@url.url</p>
@@ -143,9 +143,9 @@
                             }
                         }
 
-                        @if (Model.Entities.hashtags is not null)
+                        @if (SelectedModel.Entities.hashtags is not null)
                         {
-                            @foreach (var tag in Model.Entities.hashtags)
+                            @foreach (var tag in SelectedModel.Entities.hashtags)
                             {
                                 <div class="row text-center textClass fst-italic">
                                     <p>@tag.tag</p>
@@ -153,9 +153,9 @@
                             }
                         }
 
-                        @if (Model.Entities.mentions is not null)
+                        @if (SelectedModel.Entities.mentions is not null)
                         {
-                            @foreach (var mention in Model.Entities.mentions)
+                            @foreach (var mention in SelectedModel.Entities.mentions)
                             {
                                 <div class="row text-center textClass fst-italic">
                                     <p>@mention.username</p>
@@ -173,7 +173,7 @@
 @*Active Filters*@
 <div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
     <div class="row justify-content-around w-100">
-        @foreach (var tag in FilteredHashtags)
+        @foreach (var tag in _twitterService.FilteredHashtags)
         {
             <span @onclick="(() => {RemoveFilter(tag);})" class="textClass fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success" style="width:auto;">@tag</span>
         }
@@ -185,14 +185,18 @@
 
     @*Live Stream*@
     <div style="flex: 1 1 0;">
-        <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Callback="ShowDetails" />
+        <CascadingValue Value="_twitterService">
+            <ItemGrouping Items="_twitterService.AllTweets" IsFilteringEnabled="IsFilterEnabled" Callback="ShowDetails" />
+        </CascadingValue>
     </div>
 
     @*Filtered Stream*@
     @if (IsFilterEnabled)
     {
         <div style="flex: 1 1 0;">
-            <ItemGrouping Items="AllItems" IsFilteringEnabled="IsFilterEnabled" Filters="FilteredHashtags" Callback="ShowDetails" />
+            <CascadingValue Value="_twitterService">
+                <ItemGrouping Items="_twitterService.AllTweets" IsFilteringEnabled="IsFilterEnabled" Filters="_twitterService.FilteredHashtags" Callback="ShowDetails" />
+            </CascadingValue>
         </div>
     }
 
@@ -254,35 +258,9 @@
 </style>
 
 @code {
-    public List<TweetModel> AllItems { get; set; } = new();
-
     public bool IsFilterEnabled;
 
-    public bool IsStreamOpen
-    {
-        get
-        {
-            return _isStreamOpen;
-        }
-        set
-        {
-            _isStreamOpen = value;
-            ToggleStream(value);
-        }
-    }
-    private bool _isStreamOpen { get; set; } = true;
-
-    public TweetModel Model { get; set; } = new();
-
-    // Popular Topic
-    public Dictionary<Hashtag, int> HashTags { get; set; } = new();
-    public Dictionary<Domain, int> Topics { get; set; } = new();
-    public Dictionary<Entity, int> Subjects { get; set; } = new();
-
-    public List<string> TopHashtags { get; set; } = new();
-    public List<string> FilteredHashtags { get; set; } = new();
-    public string TrendingTopic { get; set; } = string.Empty;
-    public string TrendingSubject { get; set; } = string.Empty;
+    public TweetModel SelectedModel { get; set; } = new();    
 
     public string Filter { get; set; } = string.Empty;
 
@@ -298,7 +276,7 @@
         {
             try
             {
-                _twitterService.TweetReceived += ProcessTweet;
+                _twitterService.TweetReceived += RefreshPage;
                 await _twitterService.StartStream();
             }
             catch (Exception ex)
@@ -309,113 +287,18 @@
     }
 
     // Twitter Service Callback
-    public async void ProcessTweet(object sender, TweetEventReceived eventArgs)
+    public async void RefreshPage(object sender, TweetEventReceived eventArgs)
     {
-        var newTweet = CreateTweetFromStream(eventArgs.TweetStream);
-        AllItems.Add(newTweet);
-
-        CalculateTrending(eventArgs.TweetStream).ConfigureAwait(false);
         await InvokeAsync(StateHasChanged);
-    }
-
-    // Convert from Stream to Tweet Model
-    public TweetModel CreateTweetFromStream(TweetStreamData stream)
-    {
-        return new TweetModel()
-            {
-                Id = stream.data.id,
-                Text = stream.data.text,
-                Language = stream.data.lang,
-                Name = $"Tweet-{stream.data.id}",
-                Domain = stream.data.context_annotations is not null ? stream.data.context_annotations.FirstOrDefault()?.domain : null,
-                Entity = stream.data.context_annotations is not null ? stream.data.context_annotations.FirstOrDefault()?.entity : null,
-                Entities = stream.data.entities
-            };
-    }
-
-    // Calculate Hashtags, Domains, and Subjects
-    public async Task CalculateTrending(TweetStreamData tweetStream)
-    {
-        try
-        {
-            // Hashtags
-            if (tweetStream.data.entities is not null)
-            {
-                var hashtags = tweetStream.data.entities.hashtags;
-                if (hashtags is not null)
-                {
-                    foreach (var tag in hashtags)
-                    {
-                        var matchTag = HashTags.Where(x => x.Key.tag.ToUpper().Trim() == tag?.tag.ToUpper().Trim()).FirstOrDefault();
-                        if (matchTag.Key is null)
-                        {
-                            HashTags.Add(tag, 1);
-                        }
-                        else
-                        {
-                            HashTags[matchTag.Key] = matchTag.Value + 1;
-                        }
-                    }
-                }
-
-                TopHashtags = HashTags.OrderByDescending(x => x.Value).Select(y => y.Key.tag).Take(10).ToList();
-            }
-
-            // DOMAIN and ENTITY
-            if (tweetStream.data.context_annotations is not null)
-            {
-                foreach (var context in tweetStream.data.context_annotations)
-                {
-                    // TOPIC
-                    var topic = context.domain;
-                    if (topic is not null)
-                    {
-                        var match = Topics.Where(x => x.Key.name.ToUpper().Trim() == topic?.name.ToUpper().Trim()).FirstOrDefault();
-                        if (match.Key is null)
-                        {
-                            Topics.Add(topic, 1);
-                        }
-                        else
-                        {
-                            Topics[match.Key] = match.Value + 1;
-                        }
-
-                        TrendingTopic = Topics.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
-                    }
-
-                    // SUBJECT
-                    var subject = context.entity;
-                    if (subject is not null)
-                    {
-                        var match = Subjects.Where(x => x.Key.name.ToUpper().Trim() == subject?.name.ToUpper().Trim()).FirstOrDefault();
-                        if (match.Key is null)
-                        {
-                            Subjects.Add(subject, 1);
-                        }
-                        else
-                        {
-                            Subjects[match.Key] = match.Value + 1;
-                        }
-
-                        TrendingSubject = Subjects.OrderByDescending(x => x.Value).FirstOrDefault().Key.name.ToString();
-                    }
-                }
-            }
-
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Could not finish trending tasks: {ex}");
-        }
-    }
+    }        
 
     // Analyze Sentiment and Render Chart
     public async void ShowDetails(TweetModel tweet)
     {
         try
         {
-            Model = tweet;
-            Model.Sentiment = await _textAnalyzerService.AnalyzeText(tweet.Text);
+            SelectedModel = tweet;
+            SelectedModel.Sentiment = await _textAnalyzerService.AnalyzeText(tweet.Text);
             StateHasChanged();
 
             ChartsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", new CancellationToken(), "./js/GeneratedJS/ItemCharts.js");
@@ -434,15 +317,15 @@
         if (isAllFilters)
         {
             // Add all filters
-            FilteredHashtags.Clear();
-            FilteredHashtags.AddRange(TopHashtags);
+            _twitterService.FilteredHashtags.Clear();
+            _twitterService.FilteredHashtags.AddRange(_twitterService.TopHashtags);
         }
         else
         {
             // Add filter if it doesn't already exist
-            if (!FilteredHashtags.Contains(filter))
+            if (!_twitterService.FilteredHashtags.Contains(filter))
             {
-                FilteredHashtags.Add(filter);
+                _twitterService.FilteredHashtags.Add(filter);
             }
         }
 
@@ -451,9 +334,9 @@
 
     public async Task RemoveFilter(string filter)
     {
-        FilteredHashtags.Remove(filter);
+        _twitterService.FilteredHashtags.Remove(filter);
 
-        if (FilteredHashtags.Count() == 0)
+        if (_twitterService.FilteredHashtags.Count() == 0)
         {
             IsFilterEnabled = false;
         }
@@ -467,9 +350,9 @@
         {
             // Pie Chart Data
             var Percentages = new decimal[] {
-                (decimal)Model.Sentiment.ConfidenceScores.Positive * 100,
-                (decimal)Model.Sentiment.ConfidenceScores.Neutral * 100,
-                (decimal)Model.Sentiment.ConfidenceScores.Negative * 100};
+                (decimal)SelectedModel.Sentiment.ConfidenceScores.Positive * 100,
+                (decimal)SelectedModel.Sentiment.ConfidenceScores.Neutral * 100,
+                (decimal)SelectedModel.Sentiment.ConfidenceScores.Negative * 100};
 
             await ChartsModule.InvokeVoidAsync("RenderCharts", new CancellationToken(), Percentages);
         }
@@ -478,16 +361,5 @@
             Debug.WriteLine($"Issue rendering charts: {ex}");
         }
     }
-
-    public async Task ToggleStream(bool isOpen)
-    {
-        if (isOpen)
-        {
-            await _twitterService.StartStream();
-        }
-        else
-        {
-            await _twitterService.StopStream();
-        }
-    }
+  
 }
