@@ -38,9 +38,9 @@ public class TwitterService
     public delegate void OnTweetReceived(object sender, TweetEventReceived e);
     public event OnTweetReceived? TweetReceived;
 
-    private IConfiguration _configuration;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    private HttpClient? httpClient;
+    private HttpClient? _httpClient;
     private string bearerToken;
 
     public Dictionary<Hashtag, int> HashTags { get; set; } = new();
@@ -66,11 +66,10 @@ public class TwitterService
     }
     private bool _isStreamOpen { get; set; } = true;
 
-    public TwitterService(IConfiguration configuration)
+    public TwitterService(IHttpClientFactory httpClientFactory)
     {
-        _configuration = configuration;
-
-        bearerToken = _configuration.GetSection("Twitter").GetSection("bearerToken").Value;
+        _httpClientFactory = httpClientFactory;
+        _httpClient = _httpClientFactory.CreateClient("TwitterAPI");
     }
 
     public class TweetEventReceived : EventArgs
@@ -88,16 +87,12 @@ public class TwitterService
     {
         try
         {
-            // Http Client Instantiation
-            httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri("https://api.twitter.com/2/tweets/sample/stream?tweet.fields=context_annotations,lang,entities");
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
 
             // Stream
-            using (httpClient)
+            using (_httpClient)
             {
-                var response = await httpClient.GetAsync("https://api.twitter.com/2/tweets/sample/stream?tweet.fields=context_annotations,lang,entities", HttpCompletionOption.ResponseHeadersRead);
+                var response = await _httpClient.GetAsync("https://api.twitter.com/2/tweets/sample/stream?tweet.fields=context_annotations,lang,entities", HttpCompletionOption.ResponseHeadersRead);
                 response.EnsureSuccessStatusCode();
 
                 using (var stream = await response.Content.ReadAsStreamAsync())
@@ -133,7 +128,7 @@ public class TwitterService
                     streamReader.Close();
                 }
 
-                httpClient.Dispose();
+                _httpClient.Dispose();
             }
         }
         catch (Exception ex)

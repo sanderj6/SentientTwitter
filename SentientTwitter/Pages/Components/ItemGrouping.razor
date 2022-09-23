@@ -24,7 +24,7 @@
                 <div style="max-height:@FilteredCSS; overflow-y:scroll;">
                     @if (Items.Any())
                     {
-                        <Virtualize @ref="virtualizeComponent" Context="item" ItemSize="50" OverscanCount="10" ItemsProvider="LoadProductDetails">
+                        <Virtualize @ref="virtualizeComponent" ItemsProvider="LoadProductDetails" Context="item" ItemSize="50" OverscanCount="10">
                             <ItemContent>
                                 <div class="row textClass" @onclick="(() => {ItemClickCallback(item);})">
                                     <div class="col-6 text-center">@item.Text</div>
@@ -54,7 +54,7 @@
     public TwitterService TwitterService { get; set; }
 
     [Parameter]
-    public List<TweetModel> Items { get; set; } = new();
+    public List<TweetModel> Items { get; set; }
 
     [Parameter]
     public Action<TweetModel> Callback { get; set; }
@@ -80,18 +80,10 @@
 
     private Virtualize<TweetModel>? virtualizeComponent { get; set; }
 
-    //protected override void OnInitialized()
-    //{
-    //    TwitterService.TweetReceived += async (object sender, TweetEventReceived eventArgs) =>
-    //    {
-    //        await InvokeAsync(async () =>
-    //        {
-    //            if (virtualizeComponent == null) return;
-    //            await virtualizeComponent?.RefreshDataAsync();
-    //            StateHasChanged();
-    //        });
-    //    };
-    //}
+    protected override void OnInitialized()
+    {
+        Items = TwitterService.AllTweets;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -133,10 +125,9 @@
     {
         try
         {
-
-            var totalCount = TwitterService.AllTweets.Count();
+            var totalCount = Items.Count();
             var numProducts = Math.Min(request.Count, totalCount - request.StartIndex);
-            var results = TwitterService.AllTweets.Skip(request.StartIndex).Take(numProducts);
+            var results = Items.Skip(request.StartIndex).Take(numProducts);
 
             return new ItemsProviderResult<TweetModel>(results, totalCount);
         }

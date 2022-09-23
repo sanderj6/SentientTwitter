@@ -186,7 +186,7 @@
     @*Live Stream*@
     <div style="flex: 1 1 0;">
         <CascadingValue Value="_twitterService">
-            <ItemGrouping Items="_twitterService.AllTweets" IsFilteringEnabled="IsFilterEnabled" Callback="ShowDetails" />
+            <ItemGrouping IsFilteringEnabled="IsFilterEnabled" Callback="ShowDetails" />
         </CascadingValue>
     </div>
 
@@ -195,7 +195,7 @@
     {
         <div style="flex: 1 1 0;">
             <CascadingValue Value="_twitterService">
-                <ItemGrouping Items="_twitterService.AllTweets" IsFilteringEnabled="IsFilterEnabled" Filters="_twitterService.FilteredHashtags" Callback="ShowDetails" />
+                <ItemGrouping IsFilteringEnabled="IsFilterEnabled" Filters="_twitterService.FilteredHashtags" Callback="ShowDetails" />
             </CascadingValue>
         </div>
     }

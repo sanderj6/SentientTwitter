@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using SentientTwitter.CosmosDB;
 using SentientTwitter.Data;
-using SentientTwitter.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,15 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ModalService>();
 builder.Services.AddSingleton<TextAnalyzerService>();
 builder.Services.AddSingleton<TwitterService>();
+
+// HttpClient
+builder.Services.AddHttpClient("TwitterAPI", client =>
+{
+    var bearerToken = builder.Configuration.GetSection("Twitter").GetSection("bearerToken").Value;
+    client.BaseAddress = new Uri("https://api.twitter.com/2/tweets/sample/stream?tweet.fields=context_annotations,lang,entities");
+    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+});
 
 // Cosmos
 builder.Services
