@@ -11,7 +11,7 @@ namespace SentientTwitter.Pages
         [Inject]
         protected TwitterService _twitterService { get; set; }
         [Inject]
-        protected TextAnalyzerService _textAnalyzerService { get; set; }
+        protected TextSentimentService _textAnalyzerService { get; set; }
         [Inject]
         protected IJSRuntime JsRuntime { get; set; }
         [Inject]

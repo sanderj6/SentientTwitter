@@ -15,11 +15,11 @@ public interface ITextAnalyzerService
     Task<DocumentSentiment> AnalyzeText();
 }
 
-public class TextAnalyzerService
+public class TextSentimentService
 {
     private TextAnalyticsClient SentimentClient { get; set; }
 
-    public TextAnalyzerService()
+    public TextSentimentService()
     {
         var endpoint = "https://moodanalyzer.cognitiveservices.azure.com/";
         var apiKey = "e26a9d4c01a64468bf1600f5cb104a12";

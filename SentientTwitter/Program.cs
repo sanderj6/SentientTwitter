@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ModalService>();
-builder.Services.AddSingleton<TextAnalyzerService>();
+builder.Services.AddSingleton<TextSentimentService>();
 builder.Services.AddSingleton<TwitterService>();
 
 // HttpClient

@@ -87,8 +87,6 @@ public class TwitterService
     {
         try
         {
-
-
             // Stream
             using (_httpClient)
             {
