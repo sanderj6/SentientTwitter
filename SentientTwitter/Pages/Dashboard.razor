@@ -207,61 +207,6 @@
 
 </div>
 
-<style>
-    ul.no-bullets {
-        list-style-type: none; /* Remove bullets */
-        padding: 0; /* Remove padding */
-        margin: 0; /* Remove margins */
-    }
-
-    .block-title {
-        flex: 1 1 auto;
-        min-height: 1.75rem;
-        margin: 0;
-        font-size: .875rem;
-        font-weight: 600;
-        line-height: 1.75rem;
-        text-transform: uppercase;
-        letter-spacing: .0625rem;
-        color: #334155;
-    }
-
-    .block-header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.625rem 1.25rem;
-        transition: opacity 3s ease-out;
-    }
-
-    .card-styles {
-        border-radius: 0.3rem;
-        background: #ffffff;
-        box--moz-box-shadow: 0 1px 2px rgb(214 219 226 / 50%), 0 1px 2px rgb(214 219 226 / 50%);
-    }
-
-    .rounded-pill {
-        border-radius: 50rem !important;
-    }
-
-    .bg-success-light {
-        background-color: #e0edcf !important;
-    }
-
-    .text-success {
-        color: #65a30d !important;
-    }
-
-    .text-info {
-        color: #0891b2 !important;
-    }
-
-    .bg-info-light {
-        background-color: #cee9f0 !important;
-    }
-</style>
-
 @code {
     public bool IsFilterEnabled;
 
@@ -286,7 +231,7 @@
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Could not start stream: {ex}");
+                Logger.LogError($"Could not start stream: {ex}");
             }
         }
     }
@@ -311,7 +256,7 @@
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Issue showing tweet details: {ex}");
+            Logger.LogError($"Issue showing tweet details: {ex}");
         }
     }
 
@@ -363,7 +308,7 @@
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Issue rendering charts: {ex}");
+            Logger.LogError($"Issue rendering charts: {ex}");
         }
     }
 

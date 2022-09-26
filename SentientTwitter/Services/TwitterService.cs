@@ -17,6 +17,7 @@ using System;
 using System.Diagnostics.Tracing;
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
+using Microsoft.Extensions.Logging;
 
 namespace SentientTwitter.Services;
 
@@ -39,6 +40,7 @@ public class TwitterService
     public event OnTweetReceived? TweetReceived;
 
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<TwitterService> _logger;
 
     private HttpClient? _httpClient;
     private string bearerToken;
@@ -66,10 +68,11 @@ public class TwitterService
     }
     private bool _isStreamOpen { get; set; } = true;
 
-    public TwitterService(IHttpClientFactory httpClientFactory)
+    public TwitterService(IHttpClientFactory httpClientFactory, ILogger<TwitterService> logger)
     {
         _httpClientFactory = httpClientFactory;
         _httpClient = _httpClientFactory.CreateClient("TwitterAPI");
+        _logger = logger;
     }
 
     public class TweetEventReceived : EventArgs
@@ -121,7 +124,7 @@ public class TwitterService
                         catch (Exception ex)
                         {
                             // If disconnected, attempt reconnect
-                            Debug.WriteLine($"Could not send HTTP request: {ex}");
+                            _logger.LogError($"Could not send HTTP request: {ex}");
                             continue;
                         }
                     }
@@ -136,7 +139,7 @@ public class TwitterService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Could not send HTTP request: {ex}");
+            _logger.LogError($"Could not send HTTP request: {ex}");
         }
     }
 
@@ -232,7 +235,7 @@ public class TwitterService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Could not finish trending tasks: {ex}");
+            _logger.LogError($"Could not finish trending tasks: {ex}");
         }
     }
 

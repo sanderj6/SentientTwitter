@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using SentientTwitter.Services;
 
 namespace SentientTwitter.Tests
@@ -8,6 +10,7 @@ namespace SentientTwitter.Tests
     {
         private readonly TwitterService _twitterService;
         private IHttpClientFactory _httpClientFactory;
+        private static ILogger<TwitterService> _logger;
 
         public TwitterService_Tests()
         {
@@ -16,14 +19,23 @@ namespace SentientTwitter.Tests
                  .BuildServiceProvider();
 
             _httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+            _logger = serviceProvider.GetService<ILogger<TwitterService>>();
 
-            _twitterService = new TwitterService(_httpClientFactory);
+            _twitterService = new TwitterService(_httpClientFactory, _logger);
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void TwitterService_StartStream_GOOD()
         {
             _twitterService.StartStream().RunSynchronously();
+            Assert.AreEqual(1, 1);
+        }
+
+        [TestMethod]
+        public void TwitterService_StartStream_BAD()
+        {
+            _twitterService.StartStream().RunSynchronously();
+            Assert.AreEqual(1, 1);
         }
     }
 }

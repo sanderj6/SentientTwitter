@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using SentientTwitter.CosmosDB;
 using SentientTwitter.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Net.Http;
 
@@ -12,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddLogging();
 builder.Services.AddScoped<ModalService>();
 builder.Services.AddSingleton<TextSentimentService>();
 builder.Services.AddSingleton<TwitterService>();
