@@ -101,16 +101,21 @@ public class TwitterService
                     {
                         try
                         {
+                            // Deserialize the stream line
                             var tweetStream = JsonConvert.DeserializeObject<TweetStreamData>(streamReader.ReadLine());
                             if (tweetStream is null || tweetStream.data is null) continue;
 
+                            // Convert to local model
                             var newTweet = CreateTweetFromStream(tweetStream);
                             AllTweets.Add(newTweet);
 
+                            // Calculate trending without awaiting
                             CalculateTrending(tweetStream).ConfigureAwait(false);
 
+                            // Callback to refresh page
                             TweetReceived?.Invoke(this, new TweetEventReceived(tweetStream, "received"));
 
+                            // Limiter
                             await Task.Delay(1);
                         }
                         catch (Exception ex)

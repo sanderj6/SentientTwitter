@@ -34,7 +34,8 @@ export function RenderCharts(percentages) {
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            maintainAspectRatio: false,
         }
     });
 }

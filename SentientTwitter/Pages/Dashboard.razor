@@ -27,151 +27,156 @@
 </div>
 
 @*KPIs*@
-<div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
-
-    <div class="d-flex flex-column justify-content-between">
-        <div class="block block-rounded d-flex flex-column h-100 mb-4">
-            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                <dl class="mb-0">
-                    <dt class="fs-3 fw-bold header-color">@_twitterService.AllTweets.Count()</dt>
-                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Total Tweets</dd>
-                </dl>
-                <div class="item item-rounded-lg bg-body-light">
-                    <i class="fa-brands fa-twitter fs-3 text-info"></i>
-                </div>
-            </div>
-            <div class="bg-body-light rounded-bottom">
-                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
-                    <span role="button">View History</span>
-                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="block block-rounded d-flex flex-column h-100 mb-4">
-
-            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                <dl class="mb-0">
-                    <dt class="fs-3 fw-bold header-color">@_twitterService.TrendingSubject</dt>
-                    <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
-                </dl>
-            </div>
-            <div class="bg-body-light rounded-bottom">
-                <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
-                    <span role="button">Filter on Subject</span>
-                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="block block-rounded d-flex flex-column h-100 mb-4 align-self-center">
-        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-            <ul>
-                <Virtualize Items="@_twitterService.TopHashtags" Context="hashtag">
-                    <ItemContent>
-                        <li class="row textClass" @onclick="(async() => {await SetFilters(hashtag);})">
-                            #@hashtag
-                        </li>
-                    </ItemContent>
-                    <Placeholder>
-                        <p>No hashtags to display...</p>
-                    </Placeholder>
-                </Virtualize>
-            </ul>
-        </div>
-        <div class="bg-body-light rounded-bottom">
-            <a @onclick="(async() => {await SetFilters(string.Empty, true);})" class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
-                <span role="button">View Top Hashtags</span>
-                <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
-            </a>
-        </div>
-    </div>
-
-    @*TWEET DETAILS*@
-    <div class="col-xl-6 col-sm-12">
-        <div class="card-styles" style="height:100%;">
-            <div class="block-header block-header-default bg-info-light">
-                <h3 class="block-title text-info">Snapshot</h3>
-            </div>
-            @if (string.IsNullOrWhiteSpace(SelectedModel.Text))
-            {
-                <div class="flex-grow-1 d-flex align-items-center justify-content-center p-3">
-                    <p class="text-center fw-bold mt-4">Please select a tweet to analyze!</p>
-                </div>
-            }
-            else
-            {
-                <div class="flex-grow-1 d-flex align-items-center p-3">
-                    <div class="row align-items-center w-100">
-                        <div class="col-6 text-center textClass align-content-center fst-italic">
-                            <p>@SelectedModel?.Text</p>
-                        </div>
-
-                        <div class="col-6" style="text-align:end;">
-                            @if (SelectedModel is not null && SelectedModel.Sentiment is not null)
-                            {
-                                <div class="row textClass justify-content-between">
-                                    <div class="col-4">
-                                        Sentiment
-                                    </div>
-                                    <div class="col-6 text-break">
-                                        <span class="col-6 text-break text-details text-muted fw-bold">
-                                            @SelectedModel.Sentiment.Sentiment
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="row justify-content-between">
-                                    <canvas id="chartjs-pie"></canvas>
-                                </div>
-                            }
-                        </div>
+<div class="offset-1 col-10 section-spacing justify-content-between align-self-stretch">
+    <div class="d-flex flex-row flex-xl-nowrap flex-lg-wrap justify-content-between">
+        <div class="d-flex flex-column justify-content-between m-2">
+            @*Count*@
+            <div class="block block-rounded d-flex flex-column" >
+                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                    <dl class="mb-0">
+                        <dt class="fs-3 fw-bold header-color">@_twitterService.AllTweets.Count()</dt>
+                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Total Tweets</dd>
+                    </dl>
+                    <div class="item item-rounded-lg bg-body-light">
+                        <i class="fa-brands fa-twitter fs-3 text-info"></i>
                     </div>
                 </div>
+                <div class="bg-body-light rounded-bottom">
+                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
+                        <span role="button">View History</span>
+                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                    </a>
+                </div>
+            </div>
 
-                @if (SelectedModel.Entities is not null)
+            @*Subject*@
+            <div class="block block-rounded d-flex flex-column" >
+
+                <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                    <dl class="mb-0">
+                        <dt class="fs-3 fw-bold header-color">@_twitterService.TrendingSubject</dt>
+                        <dd class="flex-sm-column fw-medium fs-sm text-muted mb-0">Trending Subject</dd>
+                    </dl>
+                </div>
+                <div class="bg-body-light rounded-bottom">
+                    <a class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
+                        <span role="button">Filter on Subject</span>
+                        <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        @*TWEET DETAILS*@
+        <div class="d-flex block block-rounded m-2">
+            <div class="card-styles">
+                <div class="block-header block-header-default bg-info-light">
+                    <h3 class="block-title text-info">Snapshot</h3>
+                </div>
+                @if (string.IsNullOrWhiteSpace(SelectedModel.Text))
                 {
-                    <div class="flex-grow-1 d-flex align-items-center p-3 justify-content-around flex-wrap">
-                        @if (SelectedModel.Entities.urls is not null)
-                        {
-                            @foreach (var url in SelectedModel.Entities.urls)
-                            {
-                                <div class="row text-center textClass fst-italic">
-                                    <p>@url.url</p>
-                                </div>
-                            }
-                        }
-
-                        @if (SelectedModel.Entities.hashtags is not null)
-                        {
-                            @foreach (var tag in SelectedModel.Entities.hashtags)
-                            {
-                                <div class="row text-center textClass fst-italic">
-                                    <p>@tag.tag</p>
-                                </div>
-                            }
-                        }
-
-                        @if (SelectedModel.Entities.mentions is not null)
-                        {
-                            @foreach (var mention in SelectedModel.Entities.mentions)
-                            {
-                                <div class="row text-center textClass fst-italic">
-                                    <p>@mention.username</p>
-                                </div>
-                            }
-                        }
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-center p-3">
+                        <p class="text-center fw-bold mt-4">Please select a tweet to analyze!</p>
                     </div>
                 }
-            }
-        </div>
-    </div>
+                else
+                {
+                    <div class="flex-grow-1 d-flex align-items-center p-3">
+                        <div class="row align-items-center w-100">
+                            <div class="col-6 text-center textClass align-content-center fst-italic">
+                                <p>@SelectedModel?.Text</p>
 
+                                @if (SelectedModel.Entities is not null)
+                                {
+                                    <div class="flex-grow-1 d-flex align-items-center p-3 justify-content-around flex-wrap">
+                                        @if (SelectedModel.Entities.urls is not null)
+                                        {
+                                            @foreach (var url in SelectedModel.Entities.urls)
+                                            {
+                                                <div class="row text-center textClass fst-italic">
+                                                    <p>@url.url</p>
+                                                </div>
+                                            }
+                                        }
+
+                                        @if (SelectedModel.Entities.hashtags is not null)
+                                        {
+                                            @foreach (var tag in SelectedModel.Entities.hashtags)
+                                            {
+                                                <div class="row text-center textClass fst-italic">
+                                                    <p>@tag.tag</p>
+                                                </div>
+                                            }
+                                        }
+
+                                        @if (SelectedModel.Entities.mentions is not null)
+                                        {
+                                            @foreach (var mention in SelectedModel.Entities.mentions)
+                                            {
+                                                <div class="row text-center textClass fst-italic">
+                                                    <p>@mention.username</p>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="col-6" style="text-align:end;">
+                                @if (SelectedModel is not null && SelectedModel.Sentiment is not null)
+                                {
+                                    <div class="row textClass justify-content-between">
+                                        <div class="col-4">
+                                            Sentiment
+                                        </div>
+                                        <div class="col-6 text-break">
+                                            <span class="col-6 text-break text-details text-muted fw-bold">
+                                                @SelectedModel.Sentiment.Sentiment
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row justify-content-between">
+                                        <canvas id="chartjs-pie" style="height:20rem;"></canvas>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @*Hashtags*@
+        <div class="d-flex block block-rounded flex-column m-2">
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                <ul>
+                    <Virtualize Items="@_twitterService.TopHashtags" Context="hashtag">
+                        <ItemContent>
+                            <li class="row textClass" @onclick="(async() => {await SetFilters(hashtag);})">
+                                #@hashtag
+                            </li>
+                        </ItemContent>
+                        <Placeholder>
+                            <p>No hashtags to display...</p>
+                        </Placeholder>
+                    </Virtualize>
+                </ul>
+            </div>
+            <div class="bg-body-light rounded-bottom">
+                <a @onclick="(async() => {await SetFilters(string.Empty, true);})" class="link-no-decoration block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
+                    <span role="button">View Top Hashtags</span>
+                    <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 @*Active Filters*@
-<div class="offset-1 col-10 section-spacing d-flex flex-row flex-wrap justify-content-between align-self-stretch">
+<div class="offset-1 col-10 d-flex flex-row flex-wrap justify-content-between align-self-stretch">
     <div class="row justify-content-around w-100">
         @foreach (var tag in _twitterService.FilteredHashtags)
         {
@@ -181,7 +186,7 @@
 </div>
 
 @*Streams*@
-<div class="offset-1 col-10 section-spacing d-flex flex-row flex-row-wrap justify-content-between align-self-stretch">
+<div class="offset-1 col-10 d-flex flex-row flex-row-wrap justify-content-between align-self-stretch">
 
     @*Live Stream*@
     <div style="flex: 1 1 0;">
@@ -260,7 +265,7 @@
 @code {
     public bool IsFilterEnabled;
 
-    public TweetModel SelectedModel { get; set; } = new();    
+    public TweetModel SelectedModel { get; set; } = new();
 
     public string Filter { get; set; } = string.Empty;
 
@@ -290,7 +295,7 @@
     public async void RefreshPage(object sender, TweetEventReceived eventArgs)
     {
         await InvokeAsync(StateHasChanged);
-    }        
+    }
 
     // Analyze Sentiment and Render Chart
     public async void ShowDetails(TweetModel tweet)
@@ -361,5 +366,5 @@
             Debug.WriteLine($"Issue rendering charts: {ex}");
         }
     }
-  
+
 }
